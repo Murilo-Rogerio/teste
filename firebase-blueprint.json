@@ -1,0 +1,240 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil biométrico, nome de usuário, metas metabólicas e estado da sessão do atleta.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "username": { "type": "string", "description": "Nome de usuário único escolhido pelo atleta" },
+        "displayName": { "type": "string", "description": "Nome de exibição do atleta" },
+        "photoUrl": { "type": "string", "description": "URL da foto de perfil" },
+        "sex": { "type": "string", "enum": ["M", "F"], "description": "Sexo biológico para TMB Mifflin-St Jeor" },
+        "age": { "type": "integer", "description": "Idade em anos" },
+        "weightKg": { "type": "number", "description": "Peso corporal atual em kg" },
+        "heightCm": { "type": "number", "description": "Altura em cm" },
+        "waistCm": { "type": "number", "description": "Circunferência da cintura em cm (0 se não informada)" },
+        "chestCm": { "type": "number", "description": "Circunferência do peitoral em cm (0 se não informada)" },
+        "armCm": { "type": "number", "description": "Circunferência do braço em cm (0 se não informada)" },
+        "thighCm": { "type": "number", "description": "Circunferência da coxa em cm (0 se não informada)" },
+        "bodyFatPercent": { "type": "number", "description": "Percentual de gordura estimado (0 se não informado)" },
+        "activityFactor": { "type": "number", "description": "Multiplicador TDEE de atividade física" },
+        "goalDeltaKcal": { "type": "integer", "description": "Ajuste calórico do objetivo em kcal" },
+        "goalLabel": { "type": "string", "description": "Nome do objetivo principal do atleta" },
+        "onboardingCompleted": { "type": "boolean", "description": "Indica se o cadastro de medidas iniciais foi concluído" },
+        "level": { "type": "integer", "description": "Nível atual de evolução no app" },
+        "currentXp": { "type": "integer", "description": "XP acumulado no nível atual" },
+        "nextLevelXp": { "type": "integer", "description": "Meta de XP para o próximo nível" },
+        "streakDays": { "type": "integer", "description": "Dias consecutivos treinados" },
+        "waterMl": { "type": "integer", "description": "Consumo de água registrado hoje em ml" },
+        "waterGoalMl": { "type": "integer", "description": "Meta diária de hidratação em ml" },
+        "activeWorkoutName": { "type": "string", "description": "Nome da ficha atualmente ativa" },
+        "activeWorkoutSubtitle": { "type": "string", "description": "Subtítulo da ficha atualmente ativa" },
+        "activeExerciseName": { "type": "string", "description": "Exercício selecionado na sessão ativa" },
+        "exerciseNotes": { "type": "string", "description": "Notas técnicas da sessão ativa" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp da última atualização (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "username",
+        "displayName",
+        "sex",
+        "age",
+        "weightKg",
+        "heightCm",
+        "activityFactor",
+        "goalDeltaKcal",
+        "goalLabel",
+        "onboardingCompleted",
+        "level",
+        "currentXp",
+        "nextLevelXp",
+        "streakDays",
+        "waterMl",
+        "waterGoalMl",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutRoutine": {
+      "title": "WorkoutRoutine",
+      "description": "Ficha de treino personalizada criada pelo atleta.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "letter": { "type": "string", "description": "Identificador curto da ficha (A, B, C...)" },
+        "statusBadge": { "type": "string", "description": "Etiqueta de status da ficha" },
+        "title": { "type": "string", "description": "Nome da ficha de treino" },
+        "subtitle": { "type": "string", "description": "Resumo de séries, reps, RPE e descanso" },
+        "exerciseNames": { "type": "array", "description": "Lista de nomes dos exercícios incluídos na ficha" },
+        "targetSets": { "type": "integer", "description": "Séries alvo por exercício" },
+        "targetReps": { "type": "string", "description": "Faixa de repetições alvo" },
+        "targetRpe": { "type": "number", "description": "RPE alvo da ficha" },
+        "targetRestSeconds": { "type": "integer", "description": "Tempo de descanso padrão em segundos" },
+        "category": { "type": "string", "enum": ["hypertrophy", "strength", "ppl", "upper_lower", "full_body"], "description": "Categoria/divisão de treino" },
+        "favorite": { "type": "boolean", "description": "Se a ficha está marcada como favorita" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp de atualização (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "letter",
+        "statusBadge",
+        "title",
+        "subtitle",
+        "exerciseNames",
+        "targetSets",
+        "targetReps",
+        "targetRpe",
+        "targetRestSeconds",
+        "category",
+        "favorite",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ActiveSet": {
+      "title": "ActiveSet",
+      "description": "Série individual registrada durante a sessão de treino ativa.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "exerciseName": { "type": "string", "description": "Nome do exercício desta série" },
+        "setOrder": { "type": "integer", "description": "Ordem numérica da série" },
+        "setLabel": { "type": "string", "description": "Rótulo da série (1, 2, W1...)" },
+        "weightKg": { "type": "number", "description": "Carga em kg" },
+        "reps": { "type": "integer", "description": "Número de repetições" },
+        "rpe": { "type": "number", "description": "Esforço percebido (RPE)" },
+        "completed": { "type": "boolean", "description": "Se a série já foi concluída" },
+        "active": { "type": "boolean", "description": "Se esta é a série em foco atual" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp de atualização (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "exerciseName",
+        "setOrder",
+        "setLabel",
+        "weightKg",
+        "reps",
+        "rpe",
+        "completed",
+        "active",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutLog": {
+      "title": "WorkoutLog",
+      "description": "Registro histórico imutável de um treino concluído pelo atleta.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "title": { "type": "string", "description": "Título da sessão concluída" },
+        "metaLine": { "type": "string", "description": "Resumo de duração e intensidade" },
+        "tonnageKg": { "type": "integer", "description": "Volume total levantado em kg" },
+        "completedSets": { "type": "integer", "description": "Total de séries concluídas" },
+        "durationMinutes": { "type": "integer", "description": "Duração em minutos" },
+        "bestExercise": { "type": "string", "description": "Principal exercício com maior carga na sessão" },
+        "bestWeightKg": { "type": "number", "description": "Maior carga registrada na sessão em kg" },
+        "bestReps": { "type": "integer", "description": "Repetições na melhor série da sessão" },
+        "iconType": { "type": "string", "enum": ["push", "pull", "legs", "custom"], "description": "Ícone visual da sessão" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "title",
+        "metaLine",
+        "tonnageKg",
+        "completedSets",
+        "durationMinutes",
+        "bestExercise",
+        "bestWeightKg",
+        "bestReps",
+        "iconType",
+        "createdAt"
+      ]
+    },
+    "MealRecord": {
+      "title": "MealRecord",
+      "description": "Refeição registrada pelo atleta no plano nutricional diário.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "timeLabel": { "type": "string", "description": "Horário da refeição (HH:mm)" },
+        "title": { "type": "string", "description": "Nome da refeição" },
+        "description": { "type": "string", "description": "Alimentos e detalhes da refeição" },
+        "calories": { "type": "integer", "description": "Calorias em kcal" },
+        "proteinG": { "type": "integer", "description": "Proteínas em gramas" },
+        "carbsG": { "type": "integer", "description": "Carboidratos em gramas" },
+        "fatG": { "type": "integer", "description": "Gorduras em gramas" },
+        "fiberG": { "type": "integer", "description": "Fibras em gramas" },
+        "completed": { "type": "boolean", "description": "Se a refeição já foi consumida" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp de atualização (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "timeLabel",
+        "title",
+        "description",
+        "calories",
+        "proteinG",
+        "carbsG",
+        "fatG",
+        "fiberG",
+        "completed",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BodyMeasurementLog": {
+      "title": "BodyMeasurementLog",
+      "description": "Histórico de pesagens e medidas corporais do atleta.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID do proprietário" },
+        "weightKg": { "type": "number", "description": "Peso corporal em kg" },
+        "waistCm": { "type": "number", "description": "Cintura em cm" },
+        "bodyFatPercent": { "type": "number", "description": "Percentual de gordura estimado" },
+        "note": { "type": "string", "description": "Observação opcional da medição" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp de criação (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "weightKg",
+        "waistCm",
+        "bodyFatPercent",
+        "note",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Perfil biométrico, username, metas calóricas/hidratação e estado da sessão ativa do atleta"
+    },
+    "/users/{userId}/routines/{routineId}": {
+      "schema": { "$ref": "#/entities/WorkoutRoutine" },
+      "description": "Fichas de treino criadas pelo usuário autenticado"
+    },
+    "/users/{userId}/active_sets/{setId}": {
+      "schema": { "$ref": "#/entities/ActiveSet" },
+      "description": "Séries em andamento na sessão ativa do usuário"
+    },
+    "/users/{userId}/workout_logs/{logId}": {
+      "schema": { "$ref": "#/entities/WorkoutLog" },
+      "description": "Histórico de sessões de treino finalizadas pelo usuário"
+    },
+    "/users/{userId}/meals/{mealId}": {
+      "schema": { "$ref": "#/entities/MealRecord" },
+      "description": "Refeições registradas pelo usuário na aba Nutrição"
+    },
+    "/users/{userId}/weight_logs/{entryId}": {
+      "schema": { "$ref": "#/entities/BodyMeasurementLog" },
+      "description": "Histórico de peso e medidas corporais registradas pelo usuário"
+    }
+  }
+}

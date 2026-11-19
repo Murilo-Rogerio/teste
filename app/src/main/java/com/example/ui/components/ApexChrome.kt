@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,11 +35,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.FitnessCenter
-import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.MilitaryTech
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.SmartToy
+import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.Icon
@@ -80,22 +79,21 @@ import com.example.ui.theme.ApexSurfaceContainerLowest
 import com.example.ui.theme.ApexTextStyles
 import com.example.viewmodel.ApexTab
 
-private const val PROFILE_AVATAR_URL =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBIvAGvCeb0z055152F4yt5Iv2qW0xa8FYwAIixFfwUfunD9HlgoOVFIgW80x2fhEd20Lb84QzJrEaxZPPLtnkK2p3v3BZGI4c8KYrTv62iDOCrRwh4xoC8fYCQ9d_iqs6dr4H6DKR3xLvaCoMDmP0N5_rb6oGP2jfJAVxjWPN8_DZuaOPVzYliYuXzf8kBF8HNOkjqb-O-Ml18RwacnlJiFGFJ5jb1NlB6PNvdtSQ"
-
 @Composable
 fun ApexTopBar(
     subtitle: String,
+    username: String,
+    photoUrl: String,
     level: Int,
     streakDays: Int,
     isOffline: Boolean,
-    onInstallClick: () -> Unit,
+    onBiometricsClick: () -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = ApexSurface.copy(alpha = 0.92f),
+        color = ApexSurface.copy(alpha = 0.94f),
         shadowElevation = 6.dp
     ) {
         Row(
@@ -110,7 +108,8 @@ fun ApexTopBar(
             // Left brand block
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.weight(1f)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.apex_launcher_icon_1795117497573),
@@ -167,7 +166,7 @@ fun ApexTopBar(
                         }
                     }
                     Text(
-                        text = subtitle.uppercase(),
+                        text = if (username.isNotBlank()) "@$username • ${subtitle.uppercase()}" else subtitle.uppercase(),
                         style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
                         color = ApexOnSurfaceVariant,
                         maxLines = 1,
@@ -209,13 +208,13 @@ fun ApexTopBar(
                         .size(44.dp)
                         .clip(CircleShape)
                         .background(ApexSurfaceContainerHigh)
-                        .clickable(onClick = onInstallClick)
-                        .testTag("header_install_btn"),
+                        .clickable(onClick = onBiometricsClick)
+                        .testTag("header_biometrics_btn"),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.InstallMobile,
-                        contentDescription = stringResource(R.string.cd_install_app),
+                        imageVector = Icons.Rounded.Straighten,
+                        contentDescription = "Editar medidas corporais",
                         tint = ApexPrimary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -223,40 +222,29 @@ fun ApexTopBar(
 
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(44.dp)
                         .clickable(onClick = onProfileClick)
                         .testTag("header_profile_avatar"),
                     contentAlignment = Alignment.Center
                 ) {
-                    SubcomposeAsyncImage(
-                        model = PROFILE_AVATAR_URL,
-                        contentDescription = stringResource(R.string.cd_profile_avatar),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, ApexPrimary.copy(alpha = 0.45f), CircleShape),
-                        error = {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(ApexSurfaceContainerHighest),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Person,
-                                    contentDescription = null,
-                                    tint = ApexPrimary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
-                    )
+                    if (photoUrl.isNotBlank()) {
+                        SubcomposeAsyncImage(
+                            model = photoUrl,
+                            contentDescription = stringResource(R.string.cd_profile_avatar),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, ApexPrimary.copy(alpha = 0.45f), CircleShape),
+                            error = { AvatarFallback(username) }
+                        )
+                    } else {
+                        AvatarFallback(username)
+                    }
                     Box(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .offset(x = (-1).dp, y = (-1).dp)
+                            .offset(x = (-3).dp, y = (-3).dp)
                             .size(10.dp)
                             .clip(CircleShape)
                             .background(ApexPrimaryContainer)
@@ -269,8 +257,37 @@ fun ApexTopBar(
 }
 
 @Composable
+private fun AvatarFallback(username: String) {
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .clip(CircleShape)
+            .background(ApexSurfaceContainerHighest)
+            .border(2.dp, ApexPrimary.copy(alpha = 0.45f), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        val initial = username.firstOrNull()?.uppercaseChar()?.toString()
+        if (initial != null) {
+            Text(
+                text = initial,
+                style = ApexTextStyles.LabelInteractive.copy(fontWeight = FontWeight.ExtraBold),
+                color = ApexPrimary
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Rounded.Person,
+                contentDescription = null,
+                tint = ApexPrimary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun ApexBottomNavigationBar(
     selectedTab: ApexTab,
+    hasActiveSession: Boolean,
     onSelectTab: (ApexTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -347,7 +364,7 @@ fun ApexBottomNavigationBar(
                                 tint = tint,
                                 modifier = Modifier.size(23.dp)
                             )
-                            if (tab == ApexTab.ATIVO) {
+                            if (tab == ApexTab.ATIVO && hasActiveSession) {
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)

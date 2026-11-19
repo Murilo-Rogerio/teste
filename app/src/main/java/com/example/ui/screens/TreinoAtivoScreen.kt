@@ -1,8 +1,8 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,33 +17,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.VolumeOff
-import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.AddAlarm
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.CloudDone
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.EditNote
-import androidx.compose.material.icons.rounded.EmojiEvents
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FitnessCenter
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.HourglassTop
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.LinearScale
-import androidx.compose.material.icons.rounded.LocalFireDepartment
-import androidx.compose.material.icons.rounded.RadioButtonUnchecked
-import androidx.compose.material.icons.rounded.SmartToy
-import androidx.compose.material.icons.rounded.StopCircle
-import androidx.compose.material.icons.rounded.SwapVert
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Remove
+import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.VolumeOff
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -52,910 +43,516 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import com.example.R
-import com.example.data.local.ActiveSetEntity
-import com.example.data.local.UserStatsEntity
-import com.example.ui.components.PulsingCyanDot
+import com.example.data.ActiveSet
+import com.example.data.UserProfile
+import com.example.data.WorkoutRoutine
 import com.example.ui.theme.ApexError
 import com.example.ui.theme.ApexOnPrimary
 import com.example.ui.theme.ApexOnSurface
 import com.example.ui.theme.ApexOnSurfaceVariant
-import com.example.ui.theme.ApexOutline
+import com.example.ui.theme.ApexOutlineVariant
 import com.example.ui.theme.ApexPrimary
 import com.example.ui.theme.ApexPrimaryContainer
 import com.example.ui.theme.ApexSecondary
-import com.example.ui.theme.ApexSecondaryContainer
+import com.example.ui.theme.ApexSuccessGreen
 import com.example.ui.theme.ApexSurfaceContainer
 import com.example.ui.theme.ApexSurfaceContainerHigh
 import com.example.ui.theme.ApexSurfaceContainerHighest
-import com.example.ui.theme.ApexSurfaceContainerLow
 import com.example.ui.theme.ApexSurfaceContainerLowest
 import com.example.ui.theme.ApexTextStyles
 import com.example.viewmodel.ApexViewModel
-
-private const val IMG_BENCH_BARBELL =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCdTL0SE_cGV4YuxXFfyXahUdhTecKm6cI-XUaTg351Q4giWimAjVaYRXwa8k2V1X_zXwr960wp5o0rumyXfQdlRyO1hhKvazSbjrHSbx1ZBBF02HFyN_6uSBZvZe6XtjI9_E13Ui89eY1hs3tEV8cncda8DEyz80JZxq9NEEFy0s-AwAssjDMrtrUy51Vsr5zznQgRN8dPZKKFfuyUhWskoPe-kK94nWC8icP_z2k"
-private const val IMG_DUMBBELL_OHP =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuAPYmmphNBZqX07Gp-Z4cO2Fzfc8Ymny-S2qFPgkPo3kEH4aribugZM62u9iEzlPBh-XL5HrRlvH-5uZbc-kJDgTQsxVL34F2C473T0m55pv60U9KRnWkPW_iD3j03Nd_AA8C9x4v2FUk2k3bAarJXRx2vk3qtkoRUOq8d1fNjC8Q82wgtZSCq-pWgSSFiWweH2PyCge_lZwxSuPQTKhgOo92SHwpaLo97-QYFRJ5w"
-private const val IMG_INCLINE_FLY =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBoHX6atld4jJQIrx3ZSoSJfLyK6d4ARfNDcq_0k4DyveSDL8RvUsFyoJMH9_zdDRHO0wka3LlDzfrGHKzdtdq5MrX2EAfZs65TjsFzzw-CrmQHSXDkEavBTsVManeeEC-goQ5LULVEc3O38QHhUNaKANo04iBaHtybzgCYPfDYXd22Aa4uCvXFgn0bSxbbN0j8sfrXbpPPRpdsVL3ttlLS9raRW5bm0yqaXUEiiVk"
-
-private data class QueuedExercise(
-    val number: Int,
-    val setsText: String,
-    val title: String,
-    val target: String,
-    val tip: String,
-    val imageUrl: String?,
-    val useSecondaryAccent: Boolean = false
-)
+import kotlin.math.roundToInt
 
 @Composable
 fun TreinoAtivoScreen(
-    stats: UserStatsEntity,
-    sets: List<ActiveSetEntity>,
+    profile: UserProfile,
+    routines: List<WorkoutRoutine>,
+    sets: List<ActiveSet>,
     elapsedSeconds: Int,
-    totalVolumeKg: Int,
     restRemainingSeconds: Int,
     restTotalPresetSeconds: Int,
     soundEnabled: Boolean,
-    showPrBanner: Boolean,
     onSelectRestPreset: (Int) -> Unit,
     onAdd30Seconds: () -> Unit,
     onSkipRest: () -> Unit,
     onToggleSound: () -> Unit,
-    onDismissPrBanner: () -> Unit,
-    onAdjustWeight: (ActiveSetEntity, Int) -> Unit,
-    onAdjustReps: (ActiveSetEntity, Int) -> Unit,
-    onCycleRpe: (ActiveSetEntity) -> Unit,
-    onToggleSetCompleted: (ActiveSetEntity) -> Unit,
-    onAddSet: () -> Unit,
-    onUpdateNotes: (String) -> Unit,
+    onAdjustWeight: (ActiveSet, Double) -> Unit,
+    onAdjustReps: (ActiveSet, Long) -> Unit,
+    onCycleRpe: (ActiveSet) -> Unit,
+    onToggleSetCompleted: (ActiveSet) -> Unit,
+    onAddSet: (String) -> Unit,
+    onDeleteSet: (String) -> Unit,
+    onUpdateNotes: (String, String) -> Unit,
     onFinishWorkout: () -> Unit,
+    onStartRoutine: (WorkoutRoutine) -> Unit,
+    onStartFreeExercise: (String) -> Unit,
+    onNavigateToRoutines: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val haptic = LocalHapticFeedback.current
-    var showFinishDialog by remember { mutableStateOf(false) }
-    var showBiomechanicsDialog by remember { mutableStateOf(false) }
-    var notesText by remember(stats.exerciseNotes) { mutableStateOf(stats.exerciseNotes) }
-    val expandedQueue = remember { mutableStateMapOf<Int, Boolean>() }
+    var notesDraft by remember(profile.exerciseNotes) { mutableStateOf(profile.exerciseNotes) }
+    var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var newExerciseName by remember { mutableStateOf("") }
 
-    val queuedExercises = remember {
-        listOf(
-            QueuedExercise(
-                number = 2,
-                setsText = "4 Séries",
-                title = "Desenvolvimento Militar com Halteres",
-                target = "Alvo: 28kg x 10 reps",
-                tip = "Mantenha cotovelos 30° à frente do plano escapular e abdômen contraído.",
-                imageUrl = IMG_DUMBBELL_OHP
-            ),
-            QueuedExercise(
-                number = 3,
-                setsText = "3 Séries",
-                title = "Crucifixo Inclinado com Halteres",
-                target = "Alvo: 20kg x 12 reps",
-                tip = "Banco a 30°, controle excêntrico de 3s com alongamento total peitoral.",
-                imageUrl = IMG_INCLINE_FLY
-            ),
-            QueuedExercise(
-                number = 4,
-                setsText = "4 Séries",
-                title = "Elevação Lateral com Cabos",
-                target = "Alvo: 12.5kg x 15 reps",
-                tip = "Polia na altura do punho para tensão constante desde o início da abdução.",
-                imageUrl = null
-            ),
-            QueuedExercise(
-                number = 5,
-                setsText = "3 Séries",
-                title = "Tríceps Corda no Pulley",
-                target = "Alvo: 35kg x 12 reps",
-                tip = "Afaste as pontas da corda no final da extensão mantendo úmeros fixos.",
-                imageUrl = null,
-                useSecondaryAccent = true
-            )
-        )
+    val realSessionVolume = remember(sets) {
+        sets.filter { it.completed }.sumOf { (it.weightKg * it.reps).roundToInt() }
     }
+    val groupedByExercise = remember(sets) { sets.groupBy { it.exerciseName } }
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // 1. TOP WORKOUT TELEMETRY HUD
-        item(key = "telemetry_hud") {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(10.dp, RoundedCornerShape(14.dp))
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(ApexSurfaceContainerHigh.copy(alpha = 0.85f))
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            PulsingCyanDot()
-                            Text(
-                                text = "SESSÃO ATIVA",
-                                style = ApexTextStyles.LabelCaps,
-                                color = ApexPrimary
-                            )
-                        }
-                        Text(
-                            text = stats.activeWorkoutName,
-                            style = ApexTextStyles.HeadlineSm,
-                            color = ApexOnSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = stats.activeWorkoutSubtitle,
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurfaceVariant
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(ApexSurfaceContainerHighest)
-                            .clickable { showFinishDialog = true }
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                            .testTag("btn_encerrar_top"),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.StopCircle,
-                            contentDescription = "Encerrar",
-                            tint = ApexError,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            text = "Encerrar",
-                            style = ApexTextStyles.LabelInteractive,
-                            color = ApexError
-                        )
-                    }
-                }
-
-                // Telemetry Badges Strip
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(ApexSurfaceContainerLowest.copy(alpha = 0.78f))
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(ApexPrimary.copy(alpha = 0.12f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Timer,
-                                contentDescription = null,
-                                tint = ApexPrimary,
-                                modifier = Modifier.size(21.dp)
-                            )
-                        }
-                        Column {
-                            Text(
-                                text = "TEMPO DECORRIDO",
-                                style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp),
-                                color = ApexOnSurfaceVariant
-                            )
-                            Text(
-                                text = ApexViewModel.formatTimer(elapsedSeconds),
-                                style = ApexTextStyles.MetricMd,
-                                color = ApexPrimary
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(ApexSurfaceContainerLowest.copy(alpha = 0.78f))
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(ApexSecondaryContainer.copy(alpha = 0.35f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.FitnessCenter,
-                                contentDescription = null,
-                                tint = ApexSecondary,
-                                modifier = Modifier.size(21.dp)
-                            )
-                        }
-                        Column {
-                            Text(
-                                text = "VOLUME TOTAL",
-                                style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp),
-                                color = ApexOnSurfaceVariant
-                            )
-                            Text(
-                                text = "${ApexViewModel.formatPtBrNumber(totalVolumeKg)} kg",
-                                style = ApexTextStyles.MetricMd,
-                                color = ApexOnSurface
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // 2. SMART REST TIMER WIDGET (CRONÔMETRO INTELIGENTE)
-        item(key = "rest_timer") {
-            SmartRestTimerCard(
-                remainingSeconds = restRemainingSeconds,
-                totalPresetSeconds = restTotalPresetSeconds,
-                soundEnabled = soundEnabled,
-                onSelectPreset = onSelectRestPreset,
-                onAdd30Seconds = onAdd30Seconds,
-                onSkip = onSkipRest,
-                onToggleSound = onToggleSound
-            )
-        }
-
-        // 3. PR CELEBRATION BANNER
-        if (showPrBanner) {
-            item(key = "pr_banner") {
-                Box(
+    if (sets.isEmpty()) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item(key = "empty_active") {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(8.dp, RoundedCornerShape(14.dp))
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(ApexSecondaryContainer, ApexSurfaceContainerHigh, ApexSurfaceContainer)
-                            )
-                        )
-                        .padding(12.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ApexSurfaceContainer)
+                        .border(1.dp, ApexPrimary.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(ApexPrimary.copy(alpha = 0.2f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.LocalFireDepartment,
-                                    contentDescription = null,
-                                    tint = ApexPrimary,
-                                    modifier = Modifier.size(23.dp)
-                                )
-                            }
-                            Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Text(
-                                        text = "NOVO RECORDE (PR)!",
-                                        style = ApexTextStyles.LabelCaps,
-                                        color = ApexPrimary
-                                    )
-                                    Text(
-                                        text = "+2.5kg",
-                                        style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                                        color = ApexPrimary,
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .background(ApexPrimary.copy(alpha = 0.2f))
-                                            .padding(horizontal = 6.dp, vertical = 1.dp)
-                                    )
-                                }
-                                Text(
-                                    text = "Supino Reto: Carga histórica superada hoje!",
-                                    style = ApexTextStyles.BodySm,
-                                    color = ApexOnSurface
-                                )
-                            }
-                        }
-                        IconButton(
-                            onClick = onDismissPrBanner,
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Close,
-                                contentDescription = stringResource(R.string.cd_close),
-                                tint = ApexOnSurfaceVariant,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // 4. CURRENT ACTIVE EXERCISE: SUPINO RETO COM BARRA
-        item(key = "active_exercise_card") {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(10.dp, RoundedCornerShape(14.dp))
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(ApexSurfaceContainerLow)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "EXERCÍCIO 1 DE 5",
-                        style = ApexTextStyles.LabelCaps,
-                        color = ApexPrimary,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(ApexPrimary.copy(alpha = 0.12f))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    )
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { showBiomechanicsDialog = true }
-                            .padding(horizontal = 6.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Info,
-                            contentDescription = null,
-                            tint = ApexOnSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "BIOMECÂNICA",
-                            style = ApexTextStyles.LabelCaps,
-                            color = ApexOnSurfaceVariant
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 10.dp)) {
-                        Text(
-                            text = "Supino Reto com Barra",
-                            style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold),
-                            color = ApexOnSurface
-                        )
-                        Text(
-                            text = "Barbell Flat Bench Press • Peitoral Maior",
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurfaceVariant
-                        )
-                    }
-                    SubcomposeAsyncImage(
-                        model = IMG_BENCH_BARBELL,
-                        contentDescription = "Supino Reto com Barra",
-                        contentScale = ContentScale.Crop,
+                    Box(
                         modifier = Modifier
                             .size(56.dp)
-                            .clip(RoundedCornerShape(10.dp)),
-                        error = {
-                            Box(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(ApexSurfaceContainerHigh),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.FitnessCenter,
-                                    contentDescription = null,
-                                    tint = ApexPrimary
-                                )
-                            }
-                        }
-                    )
-                }
-
-                // AI Suggestion & History
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(ApexSurfaceContainerHigh.copy(alpha = 0.85f))
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .clip(CircleShape)
+                            .background(ApexPrimaryContainer.copy(alpha = 0.14f)),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.SmartToy,
+                            imageVector = Icons.Rounded.Timer,
                             contentDescription = null,
                             tint = ApexPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            text = "IA Sugestão: 84kg x 8 reps (RPE 8.5)",
-                            style = ApexTextStyles.LabelInteractive,
-                            color = ApexPrimary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            modifier = Modifier.size(28.dp)
                         )
                     }
-                    Row(
-                        modifier = Modifier.padding(horizontal = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.History,
-                            contentDescription = null,
-                            tint = ApexOnSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "Último treino: 82kg x 8 reps (100% batido)",
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurfaceVariant
-                        )
-                    }
-                }
-
-                // DYNAMIC SETS TABLE
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("SET", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant, modifier = Modifier.weight(1.6f), textAlign = TextAlign.Center)
-                        Text("KG", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant, modifier = Modifier.weight(3.2f), textAlign = TextAlign.Center)
-                        Text("REPS", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant, modifier = Modifier.weight(3.2f), textAlign = TextAlign.Center)
-                        Text("RPE", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                        Text("FEITO", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                    }
-
-                    sets.forEach { setItem ->
-                        if (setItem.isActive) {
-                            ActiveSetRow(
-                                set = setItem,
-                                onDecWeight = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onAdjustWeight(setItem, -2)
-                                },
-                                onIncWeight = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onAdjustWeight(setItem, 2)
-                                },
-                                onDecReps = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onAdjustReps(setItem, -1)
-                                },
-                                onIncReps = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onAdjustReps(setItem, 1)
-                                },
-                                onCycleRpe = { onCycleRpe(setItem) },
-                                onToggleDone = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onToggleSetCompleted(setItem)
-                                }
-                            )
-                        } else {
-                            StandardSetRow(
-                                set = setItem,
-                                onToggleDone = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onToggleSetCompleted(setItem)
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Quick Micro Actions & Notes
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(44.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(ApexSurfaceContainerHigh.copy(alpha = 0.85f))
-                                .clickable(onClick = onAddSet)
-                                .testTag("btn_add_set"),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Add,
-                                contentDescription = null,
-                                tint = ApexPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Adicionar Série",
-                                style = ApexTextStyles.LabelInteractive,
-                                color = ApexPrimary
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(ApexSurfaceContainerHigh.copy(alpha = 0.85f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.SwapVert,
-                                contentDescription = "Reordenar",
-                                tint = ApexOnSurfaceVariant,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-
-                    OutlinedTextField(
-                        value = notesText,
-                        onValueChange = {
-                            notesText = it
-                            onUpdateNotes(it)
-                        },
-                        placeholder = {
-                            Text(
-                                "Anotação técnica (ex: pino 3, pegada aberta)...",
-                                style = ApexTextStyles.BodySm,
-                                color = ApexOnSurfaceVariant
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.EditNote,
-                                contentDescription = null,
-                                tint = ApexOnSurfaceVariant,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        textStyle = ApexTextStyles.BodySm.copy(color = ApexOnSurface),
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = ApexSurfaceContainerLowest.copy(alpha = 0.85f),
-                            unfocusedContainerColor = ApexSurfaceContainerLowest.copy(alpha = 0.85f),
-                            focusedBorderColor = ApexPrimary,
-                            unfocusedBorderColor = Color.Transparent
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-
-        // 5. UPCOMING EXERCISES ACCORDION QUEUE
-        item(key = "upcoming_queue") {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Text(
-                        text = "Próximos no Treino",
+                        text = "Nenhum Treino Ativo",
                         style = ApexTextStyles.HeadlineSm,
                         color = ApexOnSurface
                     )
                     Text(
-                        text = "4 EXERCÍCIOS RESTANTES",
+                        text = "Inicie uma das suas fichas criadas ou comece um treino livre registrando o primeiro exercício.",
+                        style = ApexTextStyles.BodySm,
+                        color = ApexOnSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Button(
+                            onClick = { showAddExerciseDialog = true },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ApexPrimaryContainer,
+                                contentColor = ApexOnPrimary
+                            ),
+                            modifier = Modifier.weight(1f).height(48.dp).testTag("btn_start_free_workout")
+                        ) {
+                            Text("Treino Livre", style = ApexTextStyles.LabelInteractive.copy(fontWeight = FontWeight.Bold))
+                        }
+                        Button(
+                            onClick = onNavigateToRoutines,
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ApexSurfaceContainerHigh,
+                                contentColor = ApexOnSurface
+                            ),
+                            modifier = Modifier.weight(1f).height(48.dp)
+                        ) {
+                            Text("Ver Fichas", style = ApexTextStyles.LabelInteractive)
+                        }
+                    }
+                }
+            }
+
+            if (routines.isNotEmpty()) {
+                item(key = "quick_start_header") {
+                    Text(
+                        text = "INICIAR RAPIDAMENTE UMA FICHA SALVA",
                         style = ApexTextStyles.LabelCaps,
                         color = ApexOnSurfaceVariant
                     )
                 }
-
-                queuedExercises.forEach { ex ->
-                    val isExpanded = expandedQueue[ex.number] == true
-                    Column(
+                items(routines, key = { it.id }) { routine ->
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(14.dp))
-                            .background(ApexSurfaceContainerLow)
-                            .clickable { expandedQueue[ex.number] = !isExpanded }
-                            .padding(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .background(ApexSurfaceContainer)
+                            .clickable { onStartRoutine(routine) }
+                            .padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(routine.title, style = ApexTextStyles.LabelInteractive, color = ApexOnSurface)
+                            Text(routine.subtitle, style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
+                        }
+                        Icon(Icons.Rounded.PlayArrow, contentDescription = "Iniciar", tint = ApexPrimary)
+                    }
+                }
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // 1. Live HUD
+            item(key = "session_hud") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(12.dp, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ApexSurfaceContainer)
+                        .border(1.dp, ApexPrimary.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("SESSÃO EM ANDAMENTO", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
+                            Text(
+                                text = profile.activeWorkoutName.ifBlank { "Treino Ativo" },
+                                style = ApexTextStyles.HeadlineSm,
+                                color = ApexOnSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(ApexPrimaryContainer.copy(alpha = 0.16f))
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = ApexViewModel.formatTimer(elapsedSeconds),
+                                style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.ExtraBold),
+                                color = ApexPrimary
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(ApexSurfaceContainerLowest)
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        HudMetric("VOLUME REAL", "${ApexViewModel.formatPtBrNumber(realSessionVolume)} kg", ApexPrimary)
+                        HudMetric("SÉRIES FEITAS", "${sets.count { it.completed }} / ${sets.size}", ApexSuccessGreen)
+                        HudMetric("EXERCÍCIOS", groupedByExercise.size.toString(), ApexSecondary)
+                    }
+                }
+            }
+
+            // 2. Smart Rest Timer Card
+            item(key = "rest_timer") {
+                val progress = if (restTotalPresetSeconds > 0) {
+                    (restRemainingSeconds.toFloat() / restTotalPresetSeconds.toFloat()).coerceIn(0f, 1f)
+                } else 0f
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ApexSurfaceContainer)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                if (ex.imageUrl != null) {
-                                    SubcomposeAsyncImage(
-                                        model = ex.imageUrl,
-                                        contentDescription = ex.title,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(RoundedCornerShape(10.dp)),
-                                        error = {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(48.dp)
-                                                    .clip(RoundedCornerShape(10.dp))
-                                                    .background(ApexSurfaceContainerHigh),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Rounded.FitnessCenter,
-                                                    contentDescription = null,
-                                                    tint = ApexPrimary
-                                                )
-                                            }
-                                        }
+                            Box(modifier = Modifier.size(60.dp), contentAlignment = Alignment.Center) {
+                                Canvas(modifier = Modifier.fillMaxSize()) {
+                                    val stroke = Stroke(width = 6.dp.toPx(), cap = StrokeCap.Round)
+                                    drawArc(
+                                        color = ApexSurfaceContainerHighest,
+                                        startAngle = -90f,
+                                        sweepAngle = 360f,
+                                        useCenter = false,
+                                        style = stroke
                                     )
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(ApexSurfaceContainerHigh),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = if (ex.useSecondaryAccent) Icons.Rounded.LinearScale else Icons.Rounded.FitnessCenter,
-                                            contentDescription = null,
-                                            tint = if (ex.useSecondaryAccent) ApexSecondary else ApexPrimary,
-                                            modifier = Modifier.size(22.dp)
-                                        )
-                                    }
-                                }
-                                Column {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = "EXERCÍCIO ${ex.number}",
-                                            style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                                            color = ApexPrimary
-                                        )
-                                        Text(
-                                            text = "• ${ex.setsText}",
-                                            style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                                            color = ApexOnSurfaceVariant
-                                        )
-                                    }
-                                    Text(
-                                        text = ex.title,
-                                        style = ApexTextStyles.LabelInteractive.copy(fontSize = 15.sp),
-                                        color = ApexOnSurface,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = ex.target,
-                                        style = ApexTextStyles.BodySm,
-                                        color = ApexOnSurfaceVariant
+                                    drawArc(
+                                        color = ApexPrimary,
+                                        startAngle = -90f,
+                                        sweepAngle = 360f * progress,
+                                        useCenter = false,
+                                        style = stroke
                                     )
                                 }
+                                Text(
+                                    text = ApexViewModel.formatTimer(restRemainingSeconds),
+                                    style = ApexTextStyles.LabelInteractive.copy(fontSize = 13.sp, fontWeight = FontWeight.ExtraBold),
+                                    color = ApexOnSurface
+                                )
                             }
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(CircleShape)
-                                    .background(ApexSurfaceContainerHigh),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                                    contentDescription = "Expandir",
-                                    tint = ApexOnSurfaceVariant,
-                                    modifier = Modifier.size(18.dp)
+                            Column {
+                                Text("SMART REST TIMER", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
+                                Text(
+                                    text = if (restRemainingSeconds > 0) "Descanso em contagem" else "Pronto para a próxima série",
+                                    style = ApexTextStyles.BodySm,
+                                    color = if (restRemainingSeconds > 0) ApexPrimary else ApexSuccessGreen
                                 )
                             }
                         }
 
-                        AnimatedVisibility(visible = isExpanded) {
-                            Text(
-                                text = "Dica técnica: ${ex.tip}",
-                                style = ApexTextStyles.BodySm,
-                                color = ApexPrimary,
+                        IconButton(onClick = onToggleSound) {
+                            Icon(
+                                imageVector = if (soundEnabled) Icons.Rounded.VolumeUp else Icons.Rounded.VolumeOff,
+                                contentDescription = "Alternar som",
+                                tint = if (soundEnabled) ApexPrimary else ApexOnSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(60, 90, 120, 180).forEach { sec ->
+                            val selected = restTotalPresetSeconds == sec
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .weight(1f)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(ApexSurfaceContainerHigh.copy(alpha = 0.65f))
-                                    .padding(10.dp)
+                                    .background(if (selected) ApexPrimaryContainer else ApexSurfaceContainerHigh)
+                                    .clickable { onSelectRestPreset(sec) }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${sec}s",
+                                    style = ApexTextStyles.LabelCaps.copy(fontSize = 11.sp),
+                                    color = if (selected) ApexOnPrimary else ApexOnSurface
+                                )
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = onAdd30Seconds,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = ApexSurfaceContainerHigh, contentColor = ApexOnSurface),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("+30s", style = ApexTextStyles.LabelInteractive)
+                        }
+                        Button(
+                            onClick = onSkipRest,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = ApexSurfaceContainerHighest, contentColor = ApexPrimary),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Rounded.SkipNext, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Pular", style = ApexTextStyles.LabelInteractive)
+                        }
+                    }
+                }
+            }
+
+            // 3. Exercise Set Tables (grouped by real exercises)
+            groupedByExercise.forEach { (exerciseName, exerciseSets) ->
+                item(key = "exercise_group_$exerciseName") {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(ApexSurfaceContainer)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Rounded.FitnessCenter, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(20.dp))
+                                Text(
+                                    text = exerciseName,
+                                    style = ApexTextStyles.HeadlineSm,
+                                    color = ApexOnSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            TextButton(onClick = { onAddSet(exerciseName) }) {
+                                Icon(Icons.Rounded.Add, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(16.dp))
+                                Text("Série", color = ApexPrimary, style = ApexTextStyles.LabelInteractive)
+                            }
+                        }
+
+                        // Table header
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("#", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant, modifier = Modifier.width(26.dp))
+                            Text("CARGA (KG)", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant, modifier = Modifier.weight(1.2f), textAlign = TextAlign.Center)
+                            Text("REPS", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                            Text("RPE", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant, modifier = Modifier.width(44.dp), textAlign = TextAlign.Center)
+                            Text("OK", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant, modifier = Modifier.width(40.dp), textAlign = TextAlign.Center)
+                        }
+
+                        exerciseSets.forEach { set ->
+                            ActiveSetRow(
+                                set = set,
+                                onAdjustWeight = { delta -> onAdjustWeight(set, delta) },
+                                onAdjustReps = { delta -> onAdjustReps(set, delta) },
+                                onCycleRpe = { onCycleRpe(set) },
+                                onToggleComplete = { onToggleSetCompleted(set) },
+                                onDelete = { onDeleteSet(set.id) }
                             )
                         }
                     }
                 }
             }
-        }
 
-        // 6. ACTION ZONE: FINISH WORKOUT TRIGGER CTA
-        item(key = "finish_cta") {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp, bottom = 14.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .shadow(14.dp, RoundedCornerShape(14.dp))
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(ApexPrimaryContainer, ApexPrimary, ApexSecondaryContainer)
-                            )
-                        )
-                        .clickable { showFinishDialog = true }
-                        .testTag("btn_finish_workout"),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.EmojiEvents,
-                        contentDescription = null,
-                        tint = ApexSurfaceContainerLowest,
-                        modifier = Modifier.size(23.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "FINALIZAR E SALVAR TREINO",
-                        style = ApexTextStyles.HeadlineSm.copy(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 0.8.sp
+            // 4. Add Another Exercise + Technical Notes + Finish CTA
+            item(key = "session_footer") {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = { showAddExerciseDialog = true },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ApexSurfaceContainerHigh,
+                            contentColor = ApexPrimary
                         ),
-                        color = ApexSurfaceContainerLowest
-                    )
-                }
+                        modifier = Modifier.fillMaxWidth().height(48.dp).testTag("btn_add_exercise_to_session")
+                    ) {
+                        Icon(Icons.Rounded.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Adicionar Outro Exercício na Sessão", style = ApexTextStyles.LabelInteractive)
+                    }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.CloudDone,
-                        contentDescription = null,
-                        tint = ApexPrimary,
-                        modifier = Modifier.size(15.dp)
+                    OutlinedTextField(
+                        value = notesDraft,
+                        onValueChange = {
+                            notesDraft = it.take(500)
+                            onUpdateNotes(profile.activeExerciseName, notesDraft)
+                        },
+                        label = { Text("Notas técnicas da sessão") },
+                        placeholder = { Text("Ex: cadência controlada, foco na amplitude...") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = ApexPrimary,
+                            unfocusedBorderColor = ApexOutlineVariant,
+                            focusedTextColor = ApexOnSurface,
+                            unfocusedTextColor = ApexOnSurface
+                        ),
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Text(
-                        text = "Armazenamento local persistido automaticamente",
-                        style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                        color = ApexOnSurfaceVariant
-                    )
+
+                    Button(
+                        onClick = onFinishWorkout,
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ApexPrimaryContainer,
+                            contentColor = ApexOnPrimary
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .testTag("btn_finish_workout")
+                    ) {
+                        Icon(Icons.Rounded.CheckCircle, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Finalizar e Salvar Treino",
+                            style = ApexTextStyles.LabelInteractive.copy(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                        )
+                    }
                 }
             }
         }
     }
 
-    if (showFinishDialog) {
+    if (showAddExerciseDialog) {
         AlertDialog(
-            onDismissRequest = { showFinishDialog = false },
+            onDismissRequest = { showAddExerciseDialog = false },
             containerColor = ApexSurfaceContainer,
             titleContentColor = ApexOnSurface,
             textContentColor = ApexOnSurfaceVariant,
-            title = { Text("Concluir Sessão de Treino?", style = ApexTextStyles.HeadlineSm) },
+            title = { Text("Adicionar Exercício") },
             text = {
-                Text(
-                    "Deseja concluir ${stats.activeWorkoutName} e registrar ${ApexViewModel.formatPtBrNumber(totalVolumeKg)} kg de volume total e +180 XP no seu histórico offline?",
-                    style = ApexTextStyles.BodyMd
+                OutlinedTextField(
+                    value = newExerciseName,
+                    onValueChange = { newExerciseName = it.take(80) },
+                    label = { Text("Nome do exercício") },
+                    placeholder = { Text("Ex: Supino Reto com Barra") },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = ApexPrimary,
+                        unfocusedBorderColor = ApexOutlineVariant,
+                        focusedTextColor = ApexOnSurface,
+                        unfocusedTextColor = ApexOnSurface
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
-                        showFinishDialog = false
-                        onFinishWorkout()
-                    }
+                        val clean = newExerciseName.trim()
+                        if (clean.isNotEmpty()) {
+                            if (sets.isEmpty()) onStartFreeExercise(clean) else onAddSet(clean)
+                            newExerciseName = ""
+                            showAddExerciseDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = ApexPrimaryContainer, contentColor = ApexOnPrimary)
                 ) {
-                    Text("Finalizar e Salvar", color = ApexPrimary, fontWeight = FontWeight.Bold)
+                    Text("Adicionar")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showFinishDialog = false }) {
-                    Text("Continuar Treinando", color = ApexOnSurfaceVariant)
-                }
-            }
-        )
-    }
-
-    if (showBiomechanicsDialog) {
-        AlertDialog(
-            onDismissRequest = { showBiomechanicsDialog = false },
-            containerColor = ApexSurfaceContainer,
-            titleContentColor = ApexOnSurface,
-            textContentColor = ApexOnSurfaceVariant,
-            title = { Text("Biomecânica • Supino Reto", style = ApexTextStyles.HeadlineSm) },
-            text = {
-                Text(
-                    "• Retração e depressão escapular constantes.\n" +
-                        "• Ângulo dos cotovelos entre 45° e 60° em relação ao tronco.\n" +
-                        "• Leg drive firme no solo sem retirar glúteos do banco.\n" +
-                        "• Trajetória leve em 'J' tocando na linha inferior do esterno.",
-                    style = ApexTextStyles.BodyMd
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showBiomechanicsDialog = false }) {
-                    Text("Entendido", color = ApexPrimary, fontWeight = FontWeight.Bold)
+                TextButton(onClick = { showAddExerciseDialog = false }) {
+                    Text("Cancelar", color = ApexOnSurfaceVariant)
                 }
             }
         )
@@ -963,415 +560,136 @@ fun TreinoAtivoScreen(
 }
 
 @Composable
-private fun SmartRestTimerCard(
-    remainingSeconds: Int,
-    totalPresetSeconds: Int,
-    soundEnabled: Boolean,
-    onSelectPreset: (Int) -> Unit,
-    onAdd30Seconds: () -> Unit,
-    onSkip: () -> Unit,
-    onToggleSound: () -> Unit
-) {
-    val progress = (remainingSeconds.toFloat() / totalPresetSeconds.coerceAtLeast(1).toFloat()).coerceIn(0f, 1f)
-    val presets = listOf(60, 90, 120, 180)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(10.dp, RoundedCornerShape(14.dp))
-            .clip(RoundedCornerShape(14.dp))
-            .background(ApexSurfaceContainer)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.HourglassTop,
-                    contentDescription = null,
-                    tint = ApexPrimary,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = "DESCANSO BIOMECÂNICO",
-                    style = ApexTextStyles.LabelInteractive.copy(fontWeight = FontWeight.Bold),
-                    color = ApexOnSurface
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
-                        .background(ApexSurfaceContainerHigh)
-                        .clickable(onClick = onToggleSound),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (soundEnabled) Icons.AutoMirrored.Rounded.VolumeUp else Icons.AutoMirrored.Rounded.VolumeOff,
-                        contentDescription = stringResource(R.string.cd_toggle_sound),
-                        tint = if (soundEnabled) ApexPrimary else ApexOnSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                Text(
-                    text = "PULAR",
-                    style = ApexTextStyles.LabelCaps,
-                    color = ApexOnSurfaceVariant,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(ApexSurfaceContainerHigh)
-                        .clickable(onClick = onSkip)
-                        .padding(horizontal = 10.dp, vertical = 7.dp)
-                        .testTag("btn_skip_rest")
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Circular Timer Ring
-            Box(
-                modifier = Modifier.size(96.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val strokeWidth = 8.dp.toPx()
-                    val inset = strokeWidth / 2f
-                    val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
-                    drawArc(
-                        color = ApexSurfaceContainerHighest,
-                        startAngle = 0f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        topLeft = Offset(inset, inset),
-                        size = arcSize,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
-                    drawArc(
-                        color = ApexPrimaryContainer,
-                        startAngle = -90f,
-                        sweepAngle = 360f * progress,
-                        useCenter = false,
-                        topLeft = Offset(inset, inset),
-                        size = arcSize,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = ApexViewModel.formatTimer(remainingSeconds),
-                        style = ApexTextStyles.MetricMd,
-                        color = ApexPrimary
-                    )
-                    Text(
-                        text = "REST",
-                        style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp),
-                        color = ApexOnSurfaceVariant
-                    )
-                }
-            }
-
-            // Presets + +30s
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    presets.forEach { sec ->
-                        val isSelected = totalPresetSeconds == sec
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) ApexPrimaryContainer else ApexSurfaceContainerHigh)
-                                .clickable { onSelectPreset(sec) }
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "${sec}s",
-                                style = ApexTextStyles.LabelInteractive.copy(fontSize = 12.sp),
-                                color = if (isSelected) ApexOnPrimary else ApexOnSurface
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(ApexSurfaceContainerHighest)
-                        .clickable(onClick = onAdd30Seconds)
-                        .testTag("btn_add_30s"),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.AddAlarm,
-                        contentDescription = null,
-                        tint = ApexPrimary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "+30 Segundos",
-                        style = ApexTextStyles.LabelInteractive.copy(fontSize = 13.sp),
-                        color = ApexPrimary
-                    )
-                }
-            }
-        }
+private fun HudMetric(label: String, value: String, color: androidx.compose.ui.graphics.Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(label, style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOnSurfaceVariant)
+        Text(value, style = ApexTextStyles.LabelInteractive.copy(fontSize = 14.sp, fontWeight = FontWeight.ExtraBold), color = color)
     }
 }
 
 @Composable
 private fun ActiveSetRow(
-    set: ActiveSetEntity,
-    onDecWeight: () -> Unit,
-    onIncWeight: () -> Unit,
-    onDecReps: () -> Unit,
-    onIncReps: () -> Unit,
+    set: ActiveSet,
+    onAdjustWeight: (Double) -> Unit,
+    onAdjustReps: (Long) -> Unit,
     onCycleRpe: () -> Unit,
-    onToggleDone: () -> Unit
+    onToggleComplete: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(6.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(ApexSurfaceContainerHighest)
-            .padding(vertical = 10.dp, horizontal = 6.dp),
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (set.completed) ApexSuccessGreen.copy(alpha = 0.12f) else ApexSurfaceContainerHigh)
+            .border(
+                1.dp,
+                if (set.completed) ApexSuccessGreen.copy(alpha = 0.45f) else ApexOutlineVariant.copy(alpha = 0.3f),
+                RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 6.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left Cyan Indicator + Set number
+        Text(
+            text = set.setLabel,
+            style = ApexTextStyles.LabelInteractive.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold),
+            color = ApexPrimary,
+            modifier = Modifier.width(22.dp),
+            textAlign = TextAlign.Center
+        )
+
+        // Weight stepper
         Row(
-            modifier = Modifier.weight(1.6f),
+            modifier = Modifier.weight(1.25f),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(30.dp)
-                    .clip(CircleShape)
-                    .background(ApexPrimary)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = set.setLabel,
-                    style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold),
-                    color = ApexPrimary
-                )
-                Text(
-                    text = "ATIVA",
-                    style = ApexTextStyles.LabelCaps.copy(fontSize = 8.sp),
-                    color = ApexPrimary
-                )
-            }
-        }
-
-        // Weight Stepper
-        Row(
-            modifier = Modifier
-                .weight(3.2f)
-                .padding(horizontal = 3.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(ApexSurfaceContainerLow)
-                .padding(horizontal = 2.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(26.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable(onClick = onDecWeight)
-                    .testTag("weight_dec"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("-", style = ApexTextStyles.LabelInteractive, color = ApexPrimary)
-            }
+            MiniStepperButton(icon = Icons.Rounded.Remove, cd = "Diminuir carga") { onAdjustWeight(-2.5) }
             Text(
-                text = set.weightKg.toString(),
-                style = ApexTextStyles.MetricMd.copy(fontSize = 17.sp),
-                color = ApexOnSurface
+                text = if (set.weightKg % 1.0 == 0.0) "${set.weightKg.toInt()}" else String.format("%.1f", set.weightKg),
+                style = ApexTextStyles.LabelInteractive.copy(fontSize = 13.sp, fontWeight = FontWeight.ExtraBold),
+                color = ApexOnSurface,
+                modifier = Modifier.padding(horizontal = 6.dp)
             )
-            Box(
-                modifier = Modifier
-                    .size(26.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable(onClick = onIncWeight)
-                    .testTag("weight_inc"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("+", style = ApexTextStyles.LabelInteractive, color = ApexPrimary)
-            }
+            MiniStepperButton(icon = Icons.Rounded.Add, cd = "Aumentar carga") { onAdjustWeight(2.5) }
         }
 
-        // Reps Stepper
+        // Reps stepper
         Row(
-            modifier = Modifier
-                .weight(3.2f)
-                .padding(horizontal = 3.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(ApexSurfaceContainerLow)
-                .padding(horizontal = 2.dp, vertical = 4.dp),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(26.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable(onClick = onDecReps)
-                    .testTag("reps_dec"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("-", style = ApexTextStyles.LabelInteractive, color = ApexPrimary)
-            }
+            MiniStepperButton(icon = Icons.Rounded.Remove, cd = "Diminuir reps") { onAdjustReps(-1L) }
             Text(
                 text = set.reps.toString(),
-                style = ApexTextStyles.MetricMd.copy(fontSize = 17.sp),
-                color = ApexOnSurface
+                style = ApexTextStyles.LabelInteractive.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                color = ApexOnSurface,
+                modifier = Modifier.padding(horizontal = 5.dp)
             )
-            Box(
-                modifier = Modifier
-                    .size(26.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable(onClick = onIncReps)
-                    .testTag("reps_inc"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("+", style = ApexTextStyles.LabelInteractive, color = ApexPrimary)
-            }
+            MiniStepperButton(icon = Icons.Rounded.Add, cd = "Aumentar reps") { onAdjustReps(1L) }
         }
 
-        // RPE Pill
+        // RPE badge
         Box(
-            modifier = Modifier.weight(2f),
+            modifier = Modifier
+                .width(42.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(ApexSurfaceContainerLowest)
+                .clickable(onClick = onCycleRpe)
+                .padding(vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = String.format("%.1f", set.rpe),
-                style = ApexTextStyles.LabelInteractive.copy(fontSize = 13.sp),
-                color = ApexPrimary,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(ApexSurfaceContainerLow)
-                    .clickable(onClick = onCycleRpe)
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
+                color = ApexSecondary
             )
         }
 
-        // Complete Set Checkbox
+        Spacer(modifier = Modifier.width(4.dp))
+
+        // Complete button
         Box(
-            modifier = Modifier.weight(2f),
+            modifier = Modifier
+                .size(34.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(if (set.completed) ApexSuccessGreen else ApexSurfaceContainerLowest)
+                .clickable(onClick = onToggleComplete),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (set.isCompleted) ApexPrimaryContainer else ApexSurfaceContainer)
-                    .clickable(onClick = onToggleDone)
-                    .testTag("complete_active_set_btn"),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (set.isCompleted) Icons.Rounded.Check else Icons.Rounded.Done,
-                    contentDescription = stringResource(R.string.cd_complete_set),
-                    tint = if (set.isCompleted) ApexOnPrimary else ApexPrimary,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
+            Icon(
+                imageVector = Icons.Rounded.Check,
+                contentDescription = "Marcar série concluída",
+                tint = if (set.completed) ApexOnPrimary else ApexOnSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        IconButton(onClick = onDelete, modifier = Modifier.size(30.dp)) {
+            Icon(
+                imageVector = Icons.Rounded.DeleteOutline,
+                contentDescription = "Excluir série",
+                tint = ApexError.copy(alpha = 0.8f),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
 
 @Composable
-private fun StandardSetRow(
-    set: ActiveSetEntity,
-    onToggleDone: () -> Unit
+private fun MiniStepperButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    cd: String,
+    onClick: () -> Unit
 ) {
-    val rowAlpha = if (set.isCompleted) 0.78f else 0.58f
-    Row(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .alpha(rowAlpha)
-            .clip(RoundedCornerShape(10.dp))
-            .background(
-                if (set.isCompleted) ApexSurfaceContainerHigh.copy(alpha = 0.55f)
-                else ApexSurfaceContainer.copy(alpha = 0.45f)
-            )
-            .padding(vertical = 8.dp, horizontal = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .size(26.dp)
+            .clip(CircleShape)
+            .background(ApexSurfaceContainerLowest)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = set.setLabel,
-            style = ApexTextStyles.LabelCaps,
-            color = if (set.setLabel == "2") ApexPrimary else ApexOnSurfaceVariant,
-            modifier = Modifier.weight(1.6f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = set.weightKg.toString(),
-            style = ApexTextStyles.MetricMd.copy(fontSize = 18.sp),
-            color = if (set.isCompleted) ApexOnSurface else ApexOnSurfaceVariant,
-            modifier = Modifier.weight(3.2f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = set.repsDisplay,
-            style = ApexTextStyles.MetricMd.copy(fontSize = 18.sp),
-            color = if (set.isCompleted) ApexOnSurface else ApexOnSurfaceVariant,
-            modifier = Modifier.weight(3.2f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = String.format("%.1f", set.rpe),
-            style = ApexTextStyles.BodySm,
-            color = ApexOnSurfaceVariant,
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.Center
-        )
-        Box(
-            modifier = Modifier.weight(2f),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (set.isCompleted) ApexPrimaryContainer else ApexSurfaceContainer)
-                    .clickable(onClick = onToggleDone),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (set.isCompleted) Icons.Rounded.Check else Icons.Rounded.RadioButtonUnchecked,
-                    contentDescription = "Série ${set.setLabel}",
-                    tint = if (set.isCompleted) ApexOnPrimary else ApexOutline,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
+        Icon(icon, contentDescription = cd, tint = ApexPrimary, modifier = Modifier.size(14.dp))
     }
 }

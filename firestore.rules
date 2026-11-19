@@ -1,0 +1,328 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny all access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- GLOBAL PRIMITIVES ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- VALIDATION BLUEPRINTS ---
+    function isValidUserProfile(data, userId) {
+      return data.userId == userId &&
+        data.username is string && data.username.size() >= 3 && data.username.size() <= 30 &&
+        data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 60 &&
+        (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 500)) &&
+        data.sex in ['M', 'F'] &&
+        data.age is int && data.age >= 12 && data.age <= 100 &&
+        data.weightKg is number && data.weightKg >= 30 && data.weightKg <= 300 &&
+        data.heightCm is number && data.heightCm >= 100 && data.heightCm <= 250 &&
+        (!('waistCm' in data) || (data.waistCm is number && data.waistCm >= 0 && data.waistCm <= 200)) &&
+        (!('chestCm' in data) || (data.chestCm is number && data.chestCm >= 0 && data.chestCm <= 200)) &&
+        (!('armCm' in data) || (data.armCm is number && data.armCm >= 0 && data.armCm <= 100)) &&
+        (!('thighCm' in data) || (data.thighCm is number && data.thighCm >= 0 && data.thighCm <= 150)) &&
+        (!('bodyFatPercent' in data) || (data.bodyFatPercent is number && data.bodyFatPercent >= 0 && data.bodyFatPercent <= 60)) &&
+        data.activityFactor is number && data.activityFactor >= 1.2 && data.activityFactor <= 1.9 &&
+        data.goalDeltaKcal is int && data.goalDeltaKcal >= -600 && data.goalDeltaKcal <= 600 &&
+        data.goalLabel is string && data.goalLabel.size() >= 1 && data.goalLabel.size() <= 40 &&
+        data.onboardingCompleted is bool &&
+        data.level is int && data.level >= 1 && data.level <= 999 &&
+        data.currentXp is int && data.currentXp >= 0 && data.currentXp <= 1000000 &&
+        data.nextLevelXp is int && data.nextLevelXp >= 100 && data.nextLevelXp <= 1000000 &&
+        data.streakDays is int && data.streakDays >= 0 && data.streakDays <= 9999 &&
+        data.waterMl is int && data.waterMl >= 0 && data.waterMl <= 10000 &&
+        data.waterGoalMl is int && data.waterGoalMl >= 1000 && data.waterGoalMl <= 10000 &&
+        (!('activeWorkoutName' in data) || (data.activeWorkoutName is string && data.activeWorkoutName.size() <= 80)) &&
+        (!('activeWorkoutSubtitle' in data) || (data.activeWorkoutSubtitle is string && data.activeWorkoutSubtitle.size() <= 160)) &&
+        (!('activeExerciseName' in data) || (data.activeExerciseName is string && data.activeExerciseName.size() <= 80)) &&
+        (!('exerciseNotes' in data) || (data.exerciseNotes is string && data.exerciseNotes.size() <= 500)) &&
+        data.createdAt is timestamp && data.createdAt <= request.time &&
+        data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidWorkoutRoutine(data, userId) {
+      return data.userId == userId &&
+        data.letter is string && data.letter.size() >= 1 && data.letter.size() <= 4 &&
+        data.statusBadge is string && data.statusBadge.size() <= 40 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 80 &&
+        data.subtitle is string && data.subtitle.size() <= 160 &&
+        data.exerciseNames is list && data.exerciseNames.size() <= 20 &&
+        (data.exerciseNames.size() == 0 || (data.exerciseNames[0] is string && data.exerciseNames[0].size() <= 80)) &&
+        data.targetSets is int && data.targetSets >= 1 && data.targetSets <= 20 &&
+        data.targetReps is string && data.targetReps.size() >= 1 && data.targetReps.size() <= 20 &&
+        data.targetRpe is number && data.targetRpe >= 1.0 && data.targetRpe <= 10.0 &&
+        data.targetRestSeconds is int && data.targetRestSeconds >= 15 && data.targetRestSeconds <= 600 &&
+        data.category in ['hypertrophy', 'strength', 'ppl', 'upper_lower', 'full_body'] &&
+        data.favorite is bool &&
+        data.createdAt is timestamp && data.createdAt <= request.time &&
+        data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidActiveSet(data, userId) {
+      return data.userId == userId &&
+        data.exerciseName is string && data.exerciseName.size() >= 1 && data.exerciseName.size() <= 80 &&
+        data.setOrder is int && data.setOrder >= 1 && data.setOrder <= 50 &&
+        data.setLabel is string && data.setLabel.size() >= 1 && data.setLabel.size() <= 10 &&
+        data.weightKg is number && data.weightKg >= 0 && data.weightKg <= 1000 &&
+        data.reps is int && data.reps >= 1 && data.reps <= 200 &&
+        data.rpe is number && data.rpe >= 1.0 && data.rpe <= 10.0 &&
+        data.completed is bool &&
+        data.active is bool &&
+        data.createdAt is timestamp && data.createdAt <= request.time &&
+        data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidWorkoutLog(data, userId) {
+      return data.userId == userId &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 100 &&
+        data.metaLine is string && data.metaLine.size() >= 1 && data.metaLine.size() <= 120 &&
+        data.tonnageKg is int && data.tonnageKg >= 0 && data.tonnageKg <= 1000000 &&
+        data.completedSets is int && data.completedSets >= 0 && data.completedSets <= 500 &&
+        data.durationMinutes is int && data.durationMinutes >= 0 && data.durationMinutes <= 600 &&
+        data.bestExercise is string && data.bestExercise.size() <= 80 &&
+        data.bestWeightKg is number && data.bestWeightKg >= 0 && data.bestWeightKg <= 1000 &&
+        data.bestReps is int && data.bestReps >= 0 && data.bestReps <= 200 &&
+        data.iconType in ['push', 'pull', 'legs', 'custom'] &&
+        data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    function isValidMealRecord(data, userId) {
+      return data.userId == userId &&
+        data.timeLabel is string && data.timeLabel.size() >= 1 && data.timeLabel.size() <= 10 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 80 &&
+        data.description is string && data.description.size() <= 200 &&
+        data.calories is int && data.calories >= 0 && data.calories <= 10000 &&
+        data.proteinG is int && data.proteinG >= 0 && data.proteinG <= 1000 &&
+        data.carbsG is int && data.carbsG >= 0 && data.carbsG <= 1000 &&
+        data.fatG is int && data.fatG >= 0 && data.fatG <= 1000 &&
+        data.fiberG is int && data.fiberG >= 0 && data.fiberG <= 300 &&
+        data.completed is bool &&
+        data.createdAt is timestamp && data.createdAt <= request.time &&
+        data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidBodyMeasurementLog(data, userId) {
+      return data.userId == userId &&
+        data.weightKg is number && data.weightKg >= 30 && data.weightKg <= 300 &&
+        data.waistCm is number && data.waistCm >= 0 && data.waistCm <= 200 &&
+        data.bodyFatPercent is number && data.bodyFatPercent >= 0 && data.bodyFatPercent <= 60 &&
+        data.note is string && data.note.size() <= 140 &&
+        data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    // --- USER PROFILE & NESTED USER-SCOPED SUBCOLLECTIONS ---
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+        isValidId(userId) &&
+        incoming().keys().hasAll([
+          'userId', 'username', 'displayName', 'sex', 'age', 'weightKg', 'heightCm',
+          'activityFactor', 'goalDeltaKcal', 'goalLabel', 'onboardingCompleted',
+          'level', 'currentXp', 'nextLevelXp', 'streakDays', 'waterMl', 'waterGoalMl',
+          'createdAt', 'updatedAt'
+        ]) &&
+        incoming().keys().hasOnly([
+          'userId', 'username', 'displayName', 'photoUrl', 'sex', 'age', 'weightKg', 'heightCm',
+          'waistCm', 'chestCm', 'armCm', 'thighCm', 'bodyFatPercent',
+          'activityFactor', 'goalDeltaKcal', 'goalLabel', 'onboardingCompleted',
+          'level', 'currentXp', 'nextLevelXp', 'streakDays', 'waterMl', 'waterGoalMl',
+          'activeWorkoutName', 'activeWorkoutSubtitle', 'activeExerciseName', 'exerciseNotes',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidUserProfile(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+        isValidId(userId) &&
+        isValidUserProfile(incoming(), userId) &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        (
+          // Action 1: Update biometrics, username & goals
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'username', 'displayName', 'photoUrl', 'sex', 'age', 'weightKg', 'heightCm',
+            'waistCm', 'chestCm', 'armCm', 'thighCm', 'bodyFatPercent',
+            'activityFactor', 'goalDeltaKcal', 'goalLabel', 'onboardingCompleted',
+            'waterGoalMl', 'updatedAt'
+          ]) ||
+          // Action 2: Update hydration intake
+          incoming().diff(existing()).affectedKeys().hasOnly(['waterMl', 'updatedAt']) ||
+          // Action 3: Update active workout metadata & notes
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'activeWorkoutName', 'activeWorkoutSubtitle', 'activeExerciseName', 'exerciseNotes', 'updatedAt'
+          ]) ||
+          // Action 4: Record workout completion progress (XP, level, streak)
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'level', 'currentXp', 'nextLevelXp', 'streakDays', 'activeWorkoutName', 'activeWorkoutSubtitle', 'activeExerciseName', 'updatedAt'
+          ])
+        );
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /routines/{routineId} {
+        allow get: if isOwner(userId) && isValidId(routineId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(routineId) &&
+          incoming().keys().hasAll([
+            'userId', 'letter', 'statusBadge', 'title', 'subtitle', 'exerciseNames',
+            'targetSets', 'targetReps', 'targetRpe', 'targetRestSeconds',
+            'category', 'favorite', 'createdAt', 'updatedAt'
+          ]) &&
+          incoming().keys().hasOnly([
+            'userId', 'letter', 'statusBadge', 'title', 'subtitle', 'exerciseNames',
+            'targetSets', 'targetReps', 'targetRpe', 'targetRestSeconds',
+            'category', 'favorite', 'createdAt', 'updatedAt'
+          ]) &&
+          isValidWorkoutRoutine(incoming(), userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(routineId) &&
+          isValidWorkoutRoutine(incoming(), userId) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          (
+            // Action 1: Toggle favorite or status badge
+            incoming().diff(existing()).affectedKeys().hasOnly(['favorite', 'statusBadge', 'updatedAt']) ||
+            // Action 2: Edit routine structure & exercises
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'title', 'subtitle', 'exerciseNames', 'targetSets', 'targetReps',
+              'targetRpe', 'targetRestSeconds', 'category', 'statusBadge', 'updatedAt'
+            ])
+          );
+
+        allow delete: if isOwner(userId) && isValidId(routineId);
+      }
+
+      match /active_sets/{setId} {
+        allow get: if isOwner(userId) && isValidId(setId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(setId) &&
+          incoming().keys().hasAll([
+            'userId', 'exerciseName', 'setOrder', 'setLabel',
+            'weightKg', 'reps', 'rpe', 'completed', 'active',
+            'createdAt', 'updatedAt'
+          ]) &&
+          incoming().keys().hasOnly([
+            'userId', 'exerciseName', 'setOrder', 'setLabel',
+            'weightKg', 'reps', 'rpe', 'completed', 'active',
+            'createdAt', 'updatedAt'
+          ]) &&
+          isValidActiveSet(incoming(), userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(setId) &&
+          isValidActiveSet(incoming(), userId) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'exerciseName', 'setLabel', 'weightKg', 'reps', 'rpe', 'completed', 'active', 'updatedAt'
+          ]);
+
+        allow delete: if isOwner(userId) && isValidId(setId);
+      }
+
+      match /workout_logs/{logId} {
+        allow get: if isOwner(userId) && isValidId(logId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(logId) &&
+          incoming().keys().hasAll([
+            'userId', 'title', 'metaLine', 'tonnageKg', 'completedSets',
+            'durationMinutes', 'bestExercise', 'bestWeightKg', 'bestReps',
+            'iconType', 'createdAt'
+          ]) &&
+          incoming().keys().hasOnly([
+            'userId', 'title', 'metaLine', 'tonnageKg', 'completedSets',
+            'durationMinutes', 'bestExercise', 'bestWeightKg', 'bestReps',
+            'iconType', 'createdAt'
+          ]) &&
+          isValidWorkoutLog(incoming(), userId);
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(logId);
+      }
+
+      match /meals/{mealId} {
+        allow get: if isOwner(userId) && isValidId(mealId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(mealId) &&
+          incoming().keys().hasAll([
+            'userId', 'timeLabel', 'title', 'description',
+            'calories', 'proteinG', 'carbsG', 'fatG', 'fiberG',
+            'completed', 'createdAt', 'updatedAt'
+          ]) &&
+          incoming().keys().hasOnly([
+            'userId', 'timeLabel', 'title', 'description',
+            'calories', 'proteinG', 'carbsG', 'fatG', 'fiberG',
+            'completed', 'createdAt', 'updatedAt'
+          ]) &&
+          isValidMealRecord(incoming(), userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(mealId) &&
+          isValidMealRecord(incoming(), userId) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          (
+            // Action 1: Toggle meal completion
+            incoming().diff(existing()).affectedKeys().hasOnly(['completed', 'updatedAt']) ||
+            // Action 2: Edit meal details
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'timeLabel', 'title', 'description', 'calories', 'proteinG',
+              'carbsG', 'fatG', 'fiberG', 'completed', 'updatedAt'
+            ])
+          );
+
+        allow delete: if isOwner(userId) && isValidId(mealId);
+      }
+
+      match /weight_logs/{entryId} {
+        allow get: if isOwner(userId) && isValidId(entryId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(entryId) &&
+          incoming().keys().hasAll([
+            'userId', 'weightKg', 'waistCm', 'bodyFatPercent', 'note', 'createdAt'
+          ]) &&
+          incoming().keys().hasOnly([
+            'userId', 'weightKg', 'waistCm', 'bodyFatPercent', 'note', 'createdAt'
+          ]) &&
+          isValidBodyMeasurementLog(incoming(), userId);
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(entryId);
+      }
+    }
+  }
+}

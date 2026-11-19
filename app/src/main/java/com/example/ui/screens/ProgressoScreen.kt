@@ -1,10 +1,9 @@
 package com.example.ui.screens
 
-import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,38 +22,23 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
-import androidx.compose.material.icons.automirrored.rounded.TrendingUp
-import androidx.compose.material.icons.rounded.Analytics
-import androidx.compose.material.icons.rounded.Backup
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Calculate
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.DataObject
-import androidx.compose.material.icons.rounded.Diamond
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.DownloadForOffline
-import androidx.compose.material.icons.rounded.DownhillSkiing
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.FitnessCenter
-import androidx.compose.material.icons.rounded.Hardware
-import androidx.compose.material.icons.rounded.HistoryEdu
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.LocalFireDepartment
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.MilitaryTech
-import androidx.compose.material.icons.rounded.QueryStats
-import androidx.compose.material.icons.rounded.Speed
-import androidx.compose.material.icons.rounded.SportsHandball
-import androidx.compose.material.icons.rounded.TableChart
-import androidx.compose.material.icons.rounded.Timelapse
-import androidx.compose.material.icons.rounded.Verified
-import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material.icons.rounded.MonitorWeight
+import androidx.compose.material.icons.rounded.ShowChart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,1198 +47,619 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
-import com.example.data.local.UserStatsEntity
-import com.example.data.local.WorkoutLogEntity
+import com.example.data.BodyMeasurementLog
+import com.example.data.UserProfile
+import com.example.data.WorkoutLog
 import com.example.ui.theme.ApexGold
 import com.example.ui.theme.ApexOnPrimary
-import com.example.ui.theme.ApexOnPrimaryContainer
 import com.example.ui.theme.ApexOnSurface
 import com.example.ui.theme.ApexOnSurfaceVariant
-import com.example.ui.theme.ApexOutline
 import com.example.ui.theme.ApexOutlineVariant
 import com.example.ui.theme.ApexPrimary
 import com.example.ui.theme.ApexPrimaryContainer
-import com.example.ui.theme.ApexSecondaryContainer
-import com.example.ui.theme.ApexSuccessGreen
-import com.example.ui.theme.ApexSurface
+import com.example.ui.theme.ApexSecondary
 import com.example.ui.theme.ApexSurfaceContainer
 import com.example.ui.theme.ApexSurfaceContainerHigh
-import com.example.ui.theme.ApexSurfaceContainerHighest
 import com.example.ui.theme.ApexSurfaceContainerLow
-import com.example.ui.theme.ApexTertiary
+import com.example.ui.theme.ApexSurfaceContainerLowest
 import com.example.ui.theme.ApexTextStyles
 import com.example.viewmodel.ApexViewModel
-import kotlin.math.abs
-
-private data class ChartPoint(
-    val xFraction: Float,
-    val yFraction: Float, // 0 = top (50K), 1 = bottom (20K)
-    val xLabel: String,
-    val tooltipVal: String,
-    val isDeload: Boolean = false,
-    val isPeak: Boolean = false
-)
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgressoScreen(
-    stats: UserStatsEntity,
-    logs: List<WorkoutLogEntity>,
+    profile: UserProfile,
+    logs: List<WorkoutLog>,
+    weightLogs: List<BodyMeasurementLog>,
+    onRecordBodyMeasurement: (Double, Double, Double, String) -> Unit,
     onBuildExportPayload: (String) -> String,
     onShowToast: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    var selectedPeriod by remember { mutableStateOf("semanal") }
-    var selectedNodeInfo by remember { mutableStateOf<String?>(null) }
-    var showCalcSheet by remember { mutableStateOf(false) }
+    var show1RmSheet by remember { mutableStateOf(false) }
     var showExportSheet by remember { mutableStateOf(false) }
+    var showLogWeightDialog by remember { mutableStateOf(false) }
+    val clipboard = LocalClipboardManager.current
 
-    val weeklyPoints = remember {
-        listOf(
-            ChartPoint(0.06f, 0.59f, "S1", "38.000 kg"),
-            ChartPoint(0.22f, 0.47f, "S2", "41.000 kg"),
-            ChartPoint(0.38f, 0.42f, "S3", "42.500 kg"),
-            ChartPoint(0.53f, 0.74f, "S4", "34.000 kg (Deload)", isDeload = true),
-            ChartPoint(0.71f, 0.34f, "S5", "45.000 kg"),
-            ChartPoint(0.90f, 0.20f, "S6 (Hoje)", "48.650 kg", isPeak = true)
-        )
-    }
-    val monthlyPoints = remember {
-        listOf(
-            ChartPoint(0.06f, 0.69f, "M1", "142.000 kg"),
-            ChartPoint(0.22f, 0.56f, "M2", "156.400 kg"),
-            ChartPoint(0.38f, 0.47f, "M3", "164.800 kg"),
-            ChartPoint(0.53f, 0.53f, "M4", "159.200 kg (Deload)", isDeload = true),
-            ChartPoint(0.71f, 0.28f, "M5", "182.500 kg"),
-            ChartPoint(0.90f, 0.16f, "M6", "194.600 kg", isPeak = true)
-        )
-    }
-    val annualPoints = remember {
-        listOf(
-            ChartPoint(0.06f, 0.81f, "2021", "1.45M kg"),
-            ChartPoint(0.22f, 0.72f, "2022", "1.68M kg"),
-            ChartPoint(0.38f, 0.59f, "2023", "1.92M kg"),
-            ChartPoint(0.53f, 0.47f, "2024", "2.15M kg"),
-            ChartPoint(0.71f, 0.31f, "2025", "2.38M kg"),
-            ChartPoint(0.90f, 0.13f, "2026", "2.56M kg", isPeak = true)
-        )
-    }
-
-    val currentPoints = when (selectedPeriod) {
-        "mensal" -> monthlyPoints
-        "anual" -> annualPoints
-        else -> weeklyPoints
-    }
-    val chartSubLabel = when (selectedPeriod) {
-        "mensal" -> "Média de volume por microciclo mensal (kg)"
-        "anual" -> "Progressão macroanual de sobrecarga linear (kg)"
-        else -> "Volume total acumulado (6 últimas semanas)"
+    val totalVolumeKg = remember(logs) { logs.sumOf { it.tonnageKg } }
+    val realPrs = remember(logs) {
+        logs.filter { it.bestExercise.isNotBlank() && it.bestWeightKg > 0.0 }
+            .groupBy { it.bestExercise }
+            .mapValues { (_, list) -> list.maxBy { it.bestWeightKg } }
+            .values
+            .sortedByDescending { it.bestWeightKg }
+            .take(4)
     }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 1. EXECUTIVE PERFORMANCE BANNER + BENTO GRID
-        item(key = "executive_banner") {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(7.dp)
-                                    .clip(CircleShape)
-                                    .background(ApexPrimaryContainer)
-                            )
-                            Text(
-                                text = "TELEMETRIA DE CARGA & VOLUME",
-                                style = ApexTextStyles.LabelCaps,
-                                color = ApexPrimary
-                            )
-                        }
-                        Text(
-                            text = "Progresso & Tonelagem",
-                            style = ApexTextStyles.HeadlineLgMobile,
-                            color = ApexOnSurface
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(ApexSurfaceContainerHigh)
-                            .clickable { showExportSheet = true }
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                            .testTag("btn_export_telemetry"),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.DownloadForOffline,
-                            contentDescription = "Exportar",
-                            tint = ApexPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text("EXPORTAR", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                    }
-                }
-
-                // Full-width Tonelagem Card
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(10.dp, RoundedCornerShape(14.dp))
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(ApexSurfaceContainer)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("VOLUME SEMANAL BRUTO", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
-                        Row(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(ApexSurfaceContainerHighest)
-                                .padding(horizontal = 8.dp, vertical = 3.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(3.dp)
-                        ) {
-                            Icon(Icons.AutoMirrored.Rounded.TrendingUp, contentDescription = null, tint = ApexSuccessGreen, modifier = Modifier.size(14.dp))
-                            Text("+12%", style = ApexTextStyles.LabelCaps, color = ApexSuccessGreen)
-                        }
-                    }
-                    Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(
-                            text = ApexViewModel.formatPtBrNumber(stats.weeklyBaseVolumeKg),
-                            style = ApexTextStyles.MetricHuge,
-                            color = ApexOnSurface
-                        )
-                        Text(
-                            text = "KG",
-                            style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold),
-                            color = ApexPrimary,
-                            modifier = Modifier.padding(bottom = 5.dp)
-                        )
-                    }
-                    Text(
-                        text = "+5.210 kg superados em relação ao microciclo S5.",
-                        style = ApexTextStyles.BodySm,
-                        color = ApexOnSurfaceVariant
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(10.dp)
-                                .clip(CircleShape)
-                                .background(ApexSurfaceContainerHighest)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.82f)
-                                    .height(10.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(ApexSecondaryContainer, ApexPrimaryContainer, ApexPrimary)
-                                        )
-                                    )
-                            )
-                        }
-                        Text("82% DA META", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                    }
-                }
-
-                // 2-Col Bento: Assiduidade + Sob Tensão
+        // 1. Real Executive Bento Grid
+        item(key = "bento_grid") {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(ApexSurfaceContainer)
-                            .padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("ASSIDUIDADE", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
-                            Icon(Icons.Rounded.Verified, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(18.dp))
-                        }
-                        Column {
-                            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text("5", style = ApexTextStyles.MetricLg, color = ApexOnSurface)
-                                Text("/ 5", style = ApexTextStyles.HeadlineSm, color = ApexOnSurfaceVariant, modifier = Modifier.padding(bottom = 3.dp))
-                            }
-                            Text("100% Executado", style = ApexTextStyles.BodySm.copy(fontWeight = FontWeight.SemiBold), color = ApexSuccessGreen)
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            repeat(5) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(6.dp)
-                                        .clip(CircleShape)
-                                        .background(ApexPrimaryContainer)
-                                )
-                            }
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(ApexSurfaceContainer)
-                            .padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("SOB TENSÃO", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
-                            Icon(Icons.Rounded.Timelapse, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(18.dp))
-                        }
-                        Column {
-                            Text("4h 38m", style = ApexTextStyles.MetricLg, color = ApexOnSurface)
-                            Text("Média 55m / sessão", style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant)
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text("RPE 8.2", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(ApexOutlineVariant))
-                            Text("Hipertrofia", style = ApexTextStyles.LabelCaps, color = ApexSuccessGreen)
-                        }
-                    }
+                    BentoMetricCard(
+                        label = "TREINOS CONCLUÍDOS",
+                        value = logs.size.toString(),
+                        subtitle = "Nível ${profile.level} • ${profile.streakDays}D sequência",
+                        accent = ApexPrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    BentoMetricCard(
+                        label = "VOLUME ACUMULADO",
+                        value = "${ApexViewModel.formatPtBrLong(totalVolumeKg)} kg",
+                        subtitle = "${logs.sumOf { it.completedSets }} séries válidas",
+                        accent = ApexSecondary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    BentoMetricCard(
+                        label = "PESO ATUAL",
+                        value = "${String.format("%.1f", profile.weightKg)} kg",
+                        subtitle = if (profile.waistCm > 0) "Cintura ${String.format("%.1f", profile.waistCm)} cm" else "Altura ${profile.heightCm.toInt()} cm",
+                        accent = ApexPrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    BentoMetricCard(
+                        label = "RECORDES PESSOAIS",
+                        value = realPrs.size.toString(),
+                        subtitle = "Calculados dos seus treinos",
+                        accent = ApexGold,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
 
-        // 2. INTERACTIVE VOLUME CHART (CURVA DE SOBRECARGA)
-        item(key = "volume_chart") {
+        // 2. Real Overload Curve (Canvas)
+        item(key = "overload_chart") {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(10.dp, RoundedCornerShape(14.dp))
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(ApexSurfaceContainer)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(Icons.Rounded.Analytics, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(20.dp))
-                        Text("Curva de Sobrecarga", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
+                    Column {
+                        Text("CURVA DE SOBRECARGA REAL", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
+                        Text("Evolução de Tonelagem", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
                     }
-                    Row(
+                    Icon(Icons.Rounded.ShowChart, contentDescription = null, tint = ApexPrimary)
+                }
+
+                val chartPoints = remember(logs) { logs.take(10).reversed().map { it.tonnageKg.toFloat() } }
+                if (chartPoints.size < 2) {
+                    Box(
                         modifier = Modifier
-                            .clip(CircleShape)
-                            .background(ApexSurfaceContainerHighest)
-                            .padding(2.dp)
+                            .fillMaxWidth()
+                            .height(110.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(ApexSurfaceContainerLowest),
+                        contentAlignment = Alignment.Center
                     ) {
-                        listOf("semanal" to "Semanal", "mensal" to "Mensal", "anual" to "Anual").forEach { (key, label) ->
-                            val active = selectedPeriod == key
-                            Text(
-                                text = label,
-                                style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                                color = if (active) ApexOnPrimary else ApexOnSurfaceVariant,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(if (active) ApexPrimary else Color.Transparent)
-                                    .clickable {
-                                        selectedPeriod = key
-                                        selectedNodeInfo = null
-                                    }
-                                    .padding(horizontal = 8.dp, vertical = 5.dp)
-                            )
-                        }
+                        Text(
+                            text = "Conclua pelo menos 2 treinos para visualizar sua curva real de progressão de volume.",
+                            style = ApexTextStyles.BodySm,
+                            color = ApexOnSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
                     }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(chartSubLabel, style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant, modifier = Modifier.weight(1f))
-                    Text("Pico: S6 (48.6k)", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexPrimaryContainer)
-                }
-
-                // Canvas High-Precision Telemetry Chart
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(176.dp)
-                        .padding(top = 8.dp)
-                ) {
+                } else {
                     Canvas(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .pointerInput(currentPoints) {
-                                detectTapGestures { offset ->
-                                    val tapXFraction = offset.x / size.width.toFloat()
-                                    val nearest = currentPoints.minByOrNull { abs(it.xFraction - tapXFraction) }
-                                    if (nearest != null) {
-                                        selectedNodeInfo = nearest.tooltipVal
-                                    }
-                                }
-                            }
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(ApexSurfaceContainerLowest)
+                            .padding(14.dp)
                     ) {
-                        val w = size.width
-                        val h = size.height
-                        val bottomY = h * 0.94f
-                        val dash = PathEffect.dashPathEffect(floatArrayOf(8f, 8f))
+                        val maxVal = (chartPoints.maxOrNull() ?: 1f).coerceAtLeast(1f)
+                        val minVal = (chartPoints.minOrNull() ?: 0f)
+                        val span = (maxVal - minVal).coerceAtLeast(1f)
+                        val stepX = size.width / (chartPoints.size - 1).coerceAtLeast(1)
 
-                        // Gridlines
-                        listOf(0.12f, 0.40f, 0.68f).forEach { yF ->
-                            drawLine(
-                                color = ApexSurfaceContainerHighest.copy(alpha = 0.7f),
-                                start = Offset(0f, h * yF),
-                                end = Offset(w, h * yF),
-                                strokeWidth = 1.dp.toPx(),
-                                pathEffect = dash
-                            )
-                        }
-                        drawLine(
-                            color = ApexSurfaceContainerHighest,
-                            start = Offset(0f, bottomY),
-                            end = Offset(w, bottomY),
-                            strokeWidth = 1.dp.toPx()
-                        )
-
-                        // Deload shaded column around index 3 (S4)
-                        val deloadX = w * currentPoints[3].xFraction
-                        drawRoundRect(
-                            color = ApexSurfaceContainerLow.copy(alpha = 0.85f),
-                            topLeft = Offset(deloadX - 24.dp.toPx(), h * 0.14f),
-                            size = Size(48.dp.toPx(), bottomY - h * 0.14f),
-                            cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
-                        )
-
-                        val coords = currentPoints.map { pt -> Offset(w * pt.xFraction, h * pt.yFraction) }
-
-                        // Area Fill
-                        val areaPath = Path().apply {
-                            moveTo(coords.first().x, coords.first().y)
-                            coords.drop(1).forEach { lineTo(it.x, it.y) }
-                            lineTo(coords.last().x, bottomY)
-                            lineTo(coords.first().x, bottomY)
-                            close()
-                        }
-                        drawPath(
-                            path = areaPath,
-                            brush = Brush.verticalGradient(
-                                listOf(
-                                    ApexPrimaryContainer.copy(alpha = 0.36f),
-                                    Color(0xFF2563EB).copy(alpha = 0.10f),
-                                    Color.Transparent
-                                )
-                            )
-                        )
-
-                        // Glowing outer line + crisp cyan stroke line
-                        val linePath = Path().apply {
-                            moveTo(coords.first().x, coords.first().y)
-                            coords.drop(1).forEach { lineTo(it.x, it.y) }
-                        }
-                        drawPath(
-                            path = linePath,
-                            color = ApexPrimaryContainer.copy(alpha = 0.3f),
-                            style = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
-                        )
-                        drawPath(
-                            path = linePath,
-                            color = ApexPrimaryContainer,
-                            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
-                        )
-
-                        // Data Nodes
-                        currentPoints.forEachIndexed { idx, pt ->
-                            val c = coords[idx]
-                            if (pt.isPeak) {
-                                drawCircle(color = ApexPrimaryContainer.copy(alpha = 0.35f), radius = 11.dp.toPx(), center = c)
-                                drawCircle(color = ApexPrimaryContainer, radius = 6.dp.toPx(), center = c)
-                                drawCircle(color = Color.White, radius = 6.dp.toPx(), center = c, style = Stroke(2.dp.toPx()))
+                        val linePath = Path()
+                        val fillPath = Path()
+                        chartPoints.forEachIndexed { idx, value ->
+                            val x = idx * stepX
+                            val y = size.height - (((value - minVal) / span) * (size.height * 0.78f)) - (size.height * 0.11f)
+                            if (idx == 0) {
+                                linePath.moveTo(x, y)
+                                fillPath.moveTo(x, size.height)
+                                fillPath.lineTo(x, y)
                             } else {
-                                drawCircle(color = ApexSurface, radius = 5.dp.toPx(), center = c)
-                                drawCircle(
-                                    color = if (pt.isDeload) ApexOutline else ApexPrimaryContainer,
-                                    radius = 5.dp.toPx(),
-                                    center = c,
-                                    style = Stroke(2.5.dp.toPx())
-                                )
+                                linePath.lineTo(x, y)
+                                fillPath.lineTo(x, y)
+                            }
+                            if (idx == chartPoints.lastIndex) {
+                                fillPath.lineTo(x, size.height)
+                                fillPath.close()
                             }
                         }
-                    }
 
-                    // Reference right Y-axis labels
-                    Text("50K", style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOutline, modifier = Modifier.align(Alignment.TopEnd).padding(top = 8.dp))
-                    Text("40K", style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOutline, modifier = Modifier.align(Alignment.CenterEnd).padding(bottom = 26.dp))
-                    Text("30K", style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOutline, modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 44.dp))
-                    Text("DELOAD", style = ApexTextStyles.LabelCaps.copy(fontSize = 8.sp), color = ApexOutline, modifier = Modifier.align(Alignment.TopCenter).padding(top = 28.dp, start = 18.dp))
-                    Text("48.65K", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexPrimaryContainer, modifier = Modifier.align(Alignment.TopEnd).padding(top = 2.dp, end = 24.dp))
-                }
-
-                // Interactive X-Axis Labels
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    currentPoints.forEach { pt ->
-                        Text(
-                            text = pt.xLabel,
-                            style = ApexTextStyles.LabelCaps.copy(
-                                fontSize = 10.sp,
-                                fontWeight = if (pt.isPeak || pt.isDeload) FontWeight.Bold else FontWeight.SemiBold
-                            ),
-                            color = when {
-                                pt.isPeak -> ApexPrimary
-                                pt.isDeload -> ApexOnSurface
-                                else -> ApexOnSurfaceVariant
-                            },
-                            modifier = Modifier.clickable { selectedNodeInfo = pt.tooltipVal }
+                        drawPath(
+                            path = fillPath,
+                            brush = Brush.verticalGradient(
+                                colors = listOf(ApexPrimaryContainer.copy(alpha = 0.35f), ApexPrimaryContainer.copy(alpha = 0.0f))
+                            )
                         )
+                        drawPath(
+                            path = linePath,
+                            color = ApexPrimary,
+                            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+                        )
+                        chartPoints.forEachIndexed { idx, value ->
+                            val x = idx * stepX
+                            val y = size.height - (((value - minVal) / span) * (size.height * 0.78f)) - (size.height * 0.11f)
+                            drawCircle(color = ApexPrimary, radius = 5.dp.toPx(), center = Offset(x, y))
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Body Measurements & Weight History
+        item(key = "body_measurements_section") {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(ApexSurfaceContainer)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Rounded.MonitorWeight, contentDescription = null, tint = ApexPrimary)
+                        Column {
+                            Text("HISTÓRICO BIOMÉTRICO", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
+                            Text("Peso & Medidas", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
+                        }
+                    }
+                    Button(
+                        onClick = { showLogWeightDialog = true },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ApexPrimaryContainer, contentColor = ApexOnPrimary),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.testTag("btn_add_weight_entry")
+                    ) {
+                        Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Registrar", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp))
                     }
                 }
 
-                // Dynamic Tooltip Display
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(ApexSurfaceContainerHigh)
-                        .padding(horizontal = 12.dp, vertical = 9.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = if (selectedNodeInfo != null) Icons.Rounded.QueryStats else Icons.Rounded.Info,
-                        contentDescription = null,
-                        tint = ApexPrimary,
-                        modifier = Modifier.size(16.dp)
+                if (weightLogs.isEmpty()) {
+                    Text(
+                        text = "Nenhuma medição adicional registrada ainda.",
+                        style = ApexTextStyles.BodySm,
+                        color = ApexOnSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    if (selectedNodeInfo != null) {
-                        Text(
-                            text = buildAnnotatedString {
-                                append("Tonelagem Registrada: ")
-                                withStyle(SpanStyle(color = ApexPrimary, fontWeight = FontWeight.Bold)) {
-                                    append(selectedNodeInfo!!)
-                                }
-                            },
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurface
-                        )
-                    } else {
-                        Text(
-                            text = "Toque nos pontos da curva para inspecionar a tonelagem por microciclo.",
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurface
-                        )
-                    }
-                }
-            }
-        }
-
-        // 3. RECORDES PESSOAIS (PRs) & CALCULADORA 1RM
-        item(key = "prs_section") {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(Icons.Rounded.FitnessCenter, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(21.dp))
-                        Text("Recordes Pessoais (PRs)", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
-                    }
-                    Row(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(ApexSurfaceContainerHigh)
-                            .clickable { showCalcSheet = true }
-                            .padding(horizontal = 10.dp, vertical = 7.dp)
-                            .testTag("btn_open_1rm_calc"),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(Icons.Rounded.Calculate, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(16.dp))
-                        Text("CALCULADORA 1RM", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexPrimary)
-                    }
-                }
-
-                PersonalRecordCard(
-                    title = "Supino Reto",
-                    badge = "NOVO PR (+5kg) 🔥",
-                    subtitle = "Batido há 2 dias com RPE 9.0",
-                    realWeight = "100 kg",
-                    estimated1Rm = "118 kg",
-                    highlightWeight = true
-                )
-                PersonalRecordCard(
-                    title = "Agachamento Livre",
-                    badge = null,
-                    subtitle = "Constância de profundidade paralela",
-                    realWeight = "140 kg",
-                    estimated1Rm = "162 kg"
-                )
-                PersonalRecordCard(
-                    title = "Levantamento Terra",
-                    badge = null,
-                    subtitle = "Pegada mista, lockout rígido",
-                    realWeight = "165 kg",
-                    estimated1Rm = "185 kg"
-                )
-                PersonalRecordCard(
-                    title = "Desenvolvimento Militar (OHP)",
-                    badge = null,
-                    subtitle = "Postura estrita sem impulso",
-                    realWeight = "62 kg",
-                    estimated1Rm = "72 kg"
-                )
-            }
-        }
-
-        // 4. MURAL DE CONQUISTAS
-        item(key = "achievements_section") {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(Icons.Rounded.MilitaryTech, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(22.dp))
-                        Text("Mural de Conquistas", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
-                    }
-                    Text("3 / 5 DESBLOQUEADAS", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                }
-
-                AchievementCard(
-                    icon = Icons.Rounded.WorkspacePremium,
-                    iconTint = ApexGold,
-                    title = "Primeira Tonelada",
-                    tier = "OURO",
-                    tierColor = ApexGold,
-                    description = "Erga mais de 1.000 kg somados em uma única sessão de treino.",
-                    unlocked = true
-                )
-                AchievementCard(
-                    icon = Icons.Rounded.Diamond,
-                    iconTint = ApexPrimary,
-                    title = "Clube dos 100kg Supino",
-                    tier = "PLATINA",
-                    tierColor = ApexPrimary,
-                    description = "Quebre a barreira de dois dígitos em série válida no Supino Reto.",
-                    unlocked = true
-                )
-                AchievementCard(
-                    icon = Icons.Rounded.LocalFireDepartment,
-                    iconTint = ApexPrimaryContainer,
-                    title = "Disciplina Espartana",
-                    tier = "DIAMANTE",
-                    tierColor = ApexPrimaryContainer,
-                    description = "Mantenha 21 dias consecutivos de constância nutricional e registro.",
-                    unlocked = true
-                )
-
-                // Achievement 4: In Progress (85%)
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(ApexSurfaceContainer)
-                        .padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .background(ApexSurfaceContainerHighest),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Rounded.Hardware, contentDescription = null, tint = ApexTertiary, modifier = Modifier.size(25.dp))
-                        }
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Titã da Terra", style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold), color = ApexOnSurface)
-                                Text("85%", style = ApexTextStyles.LabelCaps, color = ApexTertiary)
-                            }
-                            Text("Alcançar 180 kg no Levantamento Terra.", style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant)
-                        }
-                    }
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Atual: 165 kg", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
-                            Text("Meta: 180 kg (-15kg)", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                        }
-                        Box(
+                } else {
+                    val fmt = remember { SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR")) }
+                    weightLogs.take(5).forEach { entry ->
+                        val dateStr = entry.createdAt?.toDate()?.let { fmt.format(it) } ?: "Hoje"
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(CircleShape)
-                                .background(ApexSurfaceContainerHighest)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(ApexSurfaceContainerLowest)
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.85f)
-                                    .height(8.dp)
-                                    .clip(CircleShape)
-                                    .background(ApexPrimary)
+                            Column {
+                                Text(
+                                    text = "${String.format("%.1f", entry.weightKg)} kg" +
+                                        (if (entry.waistCm > 0) " • Cintura ${String.format("%.1f", entry.waistCm)}cm" else "") +
+                                        (if (entry.bodyFatPercent > 0) " • ${String.format("%.1f", entry.bodyFatPercent)}% BF" else ""),
+                                    style = ApexTextStyles.LabelInteractive,
+                                    color = ApexOnSurface
+                                )
+                                if (entry.note.isNotBlank()) {
+                                    Text(entry.note, style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
+                                }
+                            }
+                            Text(dateStr, style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexPrimary)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Real Personal Records + 1RM Calculator CTA
+        item(key = "prs_section") {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(ApexSurfaceContainer)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Rounded.EmojiEvents, contentDescription = null, tint = ApexGold)
+                        Text("Recordes Pessoais (PRs)", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
+                    }
+                    TextButton(onClick = { show1RmSheet = true }) {
+                        Icon(Icons.Rounded.Calculate, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Calc 1RM", color = ApexPrimary, style = ApexTextStyles.LabelInteractive)
+                    }
+                }
+
+                if (realPrs.isEmpty()) {
+                    Text(
+                        text = "Seus recordes pessoais aparecerão automaticamente conforme você finalizar seus treinos reais.",
+                        style = ApexTextStyles.BodySm,
+                        color = ApexOnSurfaceVariant
+                    )
+                } else {
+                    realPrs.forEach { pr ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(ApexSurfaceContainerHigh)
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(pr.bestExercise, style = ApexTextStyles.LabelInteractive, color = ApexOnSurface)
+                                Text("${pr.bestReps} reps registradas", style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
+                            }
+                            Text(
+                                text = "${String.format("%.1f", pr.bestWeightKg)} kg",
+                                style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Black),
+                                color = ApexGold
                             )
                         }
                     }
                 }
-
-                // Achievement 5: Locked
-                AchievementCard(
-                    icon = Icons.Rounded.Lock,
-                    iconTint = ApexOutline,
-                    title = "Monstro dos 500kg",
-                    tier = "BLOQUEADO",
-                    tierColor = ApexOutline,
-                    description = "Total somado Supino + Agacho + Terra > 500 kg (Progresso atual: 405 kg / 500 kg).",
-                    unlocked = false,
-                    isLocked = true
-                )
             }
         }
 
-        // 5. LOGS DE TREINOS RECENTES
+        // 5. Real Workout Logs History
         item(key = "logs_header") {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Rounded.HistoryEdu, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(22.dp))
-                    Text("Logs de Treinos Recentes", style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
-                }
-                Text("MICROCICLO 42", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
-            }
-        }
-
-        items(logs, key = { it.id }) { log ->
-            val icon = when (log.iconType) {
-                "pull" -> Icons.AutoMirrored.Rounded.DirectionsRun
-                "legs" -> Icons.Rounded.DownhillSkiing
-                else -> Icons.Rounded.SportsHandball
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(ApexSurfaceContainer)
-                    .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(ApexSurfaceContainerHighest),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(icon, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(22.dp))
-                    }
-                    Column {
-                        Text(
-                            text = log.title,
-                            style = ApexTextStyles.LabelInteractive.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
-                            color = ApexOnSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = log.metaLine,
-                            style = ApexTextStyles.BodySm,
-                            color = ApexOnSurfaceVariant
-                        )
-                    }
-                }
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "${ApexViewModel.formatPtBrNumber(log.tonnageKg)} kg",
-                        style = ApexTextStyles.MetricMd.copy(fontSize = 18.sp),
-                        color = if (log.isRecentHighlight) ApexPrimary else ApexOnSurface
-                    )
-                    Text(
-                        text = log.seriesLabel,
-                        style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp),
-                        color = if (log.isRecentHighlight) ApexSuccessGreen else ApexOnSurfaceVariant
-                    )
+                Text("LOGS DE TREINOS RECENTES", style = ApexTextStyles.LabelCaps, color = ApexOnSurfaceVariant)
+                TextButton(onClick = { showExportSheet = true }) {
+                    Icon(Icons.Rounded.DownloadForOffline, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Exportar", color = ApexPrimary, style = ApexTextStyles.LabelInteractive)
                 }
             }
         }
 
-        item(key = "bottom_spacer") { Spacer(modifier = Modifier.height(14.dp)) }
-    }
-
-    // Modal Bottom Sheet: Calculadora 1RM Científica
-    if (showCalcSheet) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = { showCalcSheet = false },
-            sheetState = sheetState,
-            containerColor = ApexSurfaceContainer,
-            dragHandle = null
-        ) {
-            OneRmCalculatorSheetContent(onClose = { showCalcSheet = false })
-        }
-    }
-
-    // Modal Bottom Sheet: Exportar Telemetria Offline
-    if (showExportSheet) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = { showExportSheet = false },
-            sheetState = sheetState,
-            containerColor = ApexSurfaceContainer,
-            dragHandle = null
-        ) {
-            ExportTelemetrySheetContent(
-                onClose = { showExportSheet = false },
-                onExportFormat = { format ->
-                    val payload = onBuildExportPayload(format)
-                    val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = if (format == "CSV") "text/csv" else "application/json"
-                        putExtra(Intent.EXTRA_SUBJECT, "Apex Performance Telemetria ($format)")
-                        putExtra(Intent.EXTRA_TEXT, payload)
-                    }
-                    runCatching {
-                        context.startActivity(Intent.createChooser(sendIntent, "Exportar Telemetria ($format)"))
-                    }
-                    onShowToast("Telemetria $format gerada com sucesso offline!")
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun PersonalRecordCard(
-    title: String,
-    badge: String?,
-    subtitle: String,
-    realWeight: String,
-    estimated1Rm: String,
-    highlightWeight: Boolean = false
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(ApexSurfaceContainer)
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(title, style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold), color = ApexOnSurface)
-                    if (badge != null) {
-                        Text(
-                            text = badge,
-                            style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp),
-                            color = ApexPrimary,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(ApexPrimary.copy(alpha = 0.2f))
-                                .padding(horizontal = 7.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-                Text(subtitle, style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant)
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(realWeight, style = ApexTextStyles.MetricMd, color = if (highlightWeight) ApexPrimary else ApexOnSurface)
-                Text("CARGA REAL", style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOnSurfaceVariant)
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(ApexSurfaceContainerLow)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Icon(Icons.Rounded.Speed, contentDescription = null, tint = ApexTertiary, modifier = Modifier.size(16.dp))
-                Text("1RM Estimado (Epley):", style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant)
-            }
-            Text(estimated1Rm, style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.ExtraBold), color = ApexOnSurface)
-        }
-    }
-}
-
-@Composable
-private fun AchievementCard(
-    icon: ImageVector,
-    iconTint: Color,
-    title: String,
-    tier: String,
-    tierColor: Color,
-    description: String,
-    unlocked: Boolean,
-    isLocked: Boolean = false
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(if (isLocked) 0.62f else 1f)
-            .clip(RoundedCornerShape(14.dp))
-            .background(if (isLocked) ApexSurfaceContainerLow else ApexSurfaceContainer)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(modifier = Modifier.size(52.dp), contentAlignment = Alignment.Center) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(ApexSurfaceContainerHighest),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(26.dp))
-            }
-            if (unlocked) {
+        if (logs.isEmpty()) {
+            item(key = "empty_logs") {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(18.dp)
-                        .clip(CircleShape)
-                        .background(iconTint),
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(ApexSurfaceContainer)
+                        .padding(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "✓",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (iconTint == ApexPrimaryContainer) ApexOnPrimaryContainer else ApexSurface
+                        text = "Nenhum treino finalizado ainda. Inicie uma sessão na aba Treinos ou Ativo.",
+                        style = ApexTextStyles.BodySm,
+                        color = ApexOnSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(title, style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold), color = ApexOnSurface, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Text(tier, style = ApexTextStyles.LabelCaps, color = tierColor)
+        } else {
+            items(logs, key = { it.id }) { log ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(ApexSurfaceContainer)
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(ApexPrimaryContainer.copy(alpha = 0.16f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Rounded.FitnessCenter, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(20.dp))
+                        }
+                        Column {
+                            Text(log.title, style = ApexTextStyles.LabelInteractive, color = ApexOnSurface)
+                            Text(log.metaLine, style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
+                        }
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "${ApexViewModel.formatPtBrLong(log.tonnageKg)} kg",
+                            style = ApexTextStyles.LabelInteractive.copy(fontWeight = FontWeight.ExtraBold),
+                            color = ApexPrimary
+                        )
+                        Text("${log.completedSets} séries", style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOnSurfaceVariant)
+                    }
+                }
             }
-            Text(description, style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
-}
 
-@Composable
-private fun OneRmCalculatorSheetContent(onClose: () -> Unit) {
-    var weightInput by remember { mutableStateOf("100") }
-    var repsInput by remember { mutableStateOf("5") }
+    // Dialog: Record Body Weight / Waist
+    if (showLogWeightDialog) {
+        var wText by remember { mutableStateOf(String.format("%.1f", profile.weightKg)) }
+        var waistText by remember { mutableStateOf(if (profile.waistCm > 0) String.format("%.1f", profile.waistCm) else "") }
+        var bfText by remember { mutableStateOf(if (profile.bodyFatPercent > 0) String.format("%.1f", profile.bodyFatPercent) else "") }
+        var noteText by remember { mutableStateOf("") }
 
-    val w = weightInput.toDoubleOrNull() ?: 0.0
-    val r = (repsInput.toDoubleOrNull() ?: 1.0).coerceAtLeast(1.0)
-    val epley = if (w > 0) w * (1.0 + r / 30.0) else 0.0
-    val brzycki = if (w > 0 && r < 37) w / (1.0278 - 0.0278 * r) else epley
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Rounded.Calculate, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(24.dp))
-                Text("Calculadora 1RM Científica", style = ApexTextStyles.HeadlineMd, color = ApexOnSurface)
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(ApexSurfaceContainerHighest)
-                    .clickable(onClick = onClose),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.cd_close), tint = ApexOnSurface, modifier = Modifier.size(18.dp))
-            }
-        }
-
-        Text(
-            text = "Estime sua repetição máxima com base em carga e repetições executadas sem ir até a falha total concêntrica.",
-            style = ApexTextStyles.BodySm,
-            color = ApexOnSurfaceVariant
-        )
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("CARGA LEVANTADA (KG)", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant)
-                OutlinedTextField(
-                    value = weightInput,
-                    onValueChange = { weightInput = it.filter { ch -> ch.isDigit() || ch == '.' } },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    textStyle = ApexTextStyles.HeadlineSm.copy(color = ApexOnSurface),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = ApexSurfaceContainerHighest,
-                        unfocusedContainerColor = ApexSurfaceContainerHighest,
-                        focusedBorderColor = ApexPrimary,
-                        unfocusedBorderColor = Color.Transparent
+        AlertDialog(
+            onDismissRequest = { showLogWeightDialog = false },
+            containerColor = ApexSurfaceContainer,
+            titleContentColor = ApexOnSurface,
+            title = { Text("Registrar Peso e Medidas") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = wText,
+                        onValueChange = { wText = it },
+                        label = { Text("Peso (kg)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true
                     )
-                )
-            }
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("REPS EXECUTADAS", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant)
-                OutlinedTextField(
-                    value = repsInput,
-                    onValueChange = { repsInput = it.filter(Char::isDigit) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    textStyle = ApexTextStyles.HeadlineSm.copy(color = ApexOnSurface),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = ApexSurfaceContainerHighest,
-                        unfocusedContainerColor = ApexSurfaceContainerHighest,
-                        focusedBorderColor = ApexPrimary,
-                        unfocusedBorderColor = Color.Transparent
+                    OutlinedTextField(
+                        value = waistText,
+                        onValueChange = { waistText = it },
+                        label = { Text("Cintura (cm) — opcional") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true
                     )
-                )
+                    OutlinedTextField(
+                        value = bfText,
+                        onValueChange = { bfText = it },
+                        label = { Text("% Gordura — opcional") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = noteText,
+                        onValueChange = { noteText = it.take(140) },
+                        label = { Text("Observação (ex: em jejum)") },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val w = wText.replace(",", ".").toDoubleOrNull()
+                        if (w != null && w in 30.0..300.0) {
+                            onRecordBodyMeasurement(
+                                w,
+                                waistText.replace(",", ".").toDoubleOrNull() ?: 0.0,
+                                bfText.replace(",", ".").toDoubleOrNull() ?: 0.0,
+                                noteText
+                            )
+                            showLogWeightDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = ApexPrimaryContainer, contentColor = ApexOnPrimary)
+                ) { Text("Salvar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogWeightDialog = false }) { Text("Cancelar", color = ApexOnSurfaceVariant) }
             }
-        }
+        )
+    }
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ApexSurfaceContainerLow)
-                    .padding(12.dp)
-            ) {
-                Text("FÓRMULA EPLEY", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
-                Text("${String.format("%.1f", epley)} kg", style = ApexTextStyles.HeadlineLgMobile, color = ApexOnSurface)
-                Text("Ideal para 1-8 repetições", style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
-            }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ApexSurfaceContainerLow)
-                    .padding(12.dp)
-            ) {
-                Text("FÓRMULA BRZYCKI", style = ApexTextStyles.LabelCaps, color = ApexTertiary)
-                Text("${String.format("%.1f", brzycki)} kg", style = ApexTextStyles.HeadlineLgMobile, color = ApexOnSurface)
-                Text("Conservador para força pura", style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
-            }
-        }
+    // Bottom Sheet: 1RM Scientific Calculator (Epley & Brzycki)
+    if (show1RmSheet) {
+        var loadText by remember { mutableStateOf("80") }
+        var repsText by remember { mutableStateOf("8") }
+        val load = loadText.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val reps = repsText.toIntOrNull()?.coerceIn(1, 30) ?: 1
+        val epley = if (reps == 1) load else load * (1.0 + (reps / 30.0))
+        val brzycki = if (reps == 1) load else load * (36.0 / (37.0 - reps.coerceAtMost(36)))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Brush.horizontalGradient(listOf(ApexPrimaryContainer, ApexSecondaryContainer)))
-                .clickable(onClick = onClose),
-            contentAlignment = Alignment.Center
+        ModalBottomSheet(
+            onDismissRequest = { show1RmSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = ApexSurfaceContainerLow,
+            contentColor = ApexOnSurface
         ) {
-            Text("Concluído", style = ApexTextStyles.HeadlineSm.copy(fontWeight = FontWeight.Bold), color = ApexSurface)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text("CALCULADORA 1RM CIENTÍFICA", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = loadText,
+                        onValueChange = { loadText = it },
+                        label = { Text("Carga (kg)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = repsText,
+                        onValueChange = { repsText = it.filter(Char::isDigit).take(2) },
+                        label = { Text("Repetições") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ApexSurfaceContainer)
+                        .padding(14.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("EPLEY 1RM", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant)
+                        Text("${epley.roundToInt()} kg", style = ApexTextStyles.HeadlineMd, color = ApexPrimary)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("BRZYCKI 1RM", style = ApexTextStyles.LabelCaps.copy(fontSize = 10.sp), color = ApexOnSurfaceVariant)
+                        Text("${brzycki.roundToInt()} kg", style = ApexTextStyles.HeadlineMd, color = ApexSecondary)
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
-        Spacer(modifier = Modifier.height(14.dp))
+    }
+
+    // Bottom Sheet: Export JSON/CSV
+    if (showExportSheet) {
+        var format by remember { mutableStateOf("JSON") }
+        val payload = remember(format, logs, profile) { onBuildExportPayload(format) }
+        ModalBottomSheet(
+            onDismissRequest = { showExportSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = ApexSurfaceContainerLow,
+            contentColor = ApexOnSurface
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("EXPORTAR TELEMETRIA DA CONTA", style = ApexTextStyles.LabelCaps, color = ApexPrimary)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("JSON", "CSV").forEach { fmt ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(if (format == fmt) ApexPrimaryContainer else ApexSurfaceContainerHigh)
+                                .clickable { format = fmt }
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(fmt, style = ApexTextStyles.LabelInteractive, color = if (format == fmt) ApexOnPrimary else ApexOnSurface)
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ApexSurfaceContainerLowest)
+                        .padding(12.dp)
+                ) {
+                    Text(payload, style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
+                }
+                Button(
+                    onClick = {
+                        clipboard.setText(AnnotatedString(payload))
+                        onShowToast("Dados $format copiados para a área de transferência!")
+                        showExportSheet = false
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ApexPrimaryContainer, contentColor = ApexOnPrimary),
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                ) {
+                    Icon(Icons.Rounded.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Copiar $format", style = ApexTextStyles.LabelInteractive.copy(fontWeight = FontWeight.ExtraBold))
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
 @Composable
-private fun ExportTelemetrySheetContent(
-    onClose: () -> Unit,
-    onExportFormat: (String) -> Unit
-) {
-    var exportedOnce by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Rounded.Backup, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(24.dp))
-                Text("Exportar Telemetria Offline", style = ApexTextStyles.HeadlineMd, color = ApexOnSurface)
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(ApexSurfaceContainerHighest)
-                    .clickable(onClick = onClose),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.cd_close), tint = ApexOnSurface, modifier = Modifier.size(18.dp))
-            }
-        }
-
-        Text(
-            text = "Gere uma cópia de segurança dos seus dados biométricos e tonelagem acumulada para uso local em planilhas ou importação.",
-            style = ApexTextStyles.BodySm,
-            color = ApexOnSurfaceVariant
-        )
-
-        ExportOptionRow(
-            icon = Icons.Rounded.DataObject,
-            iconTint = ApexPrimary,
-            title = "Exportar formato JSON",
-            subtitle = "Backup completo com timestamps brutos",
-            onClick = {
-                exportedOnce = true
-                onExportFormat("JSON")
-            }
-        )
-        ExportOptionRow(
-            icon = Icons.Rounded.TableChart,
-            iconTint = ApexPrimaryContainer,
-            title = "Exportar formato CSV",
-            subtitle = "Compatível com Excel, Notion e Google Sheets",
-            onClick = {
-                exportedOnce = true
-                onExportFormat("CSV")
-            }
-        )
-
-        if (exportedOnce) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ApexPrimary.copy(alpha = 0.12f))
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = ApexPrimary, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Download iniciado com sucesso! Arquivo gerado offline.", style = ApexTextStyles.BodySm.copy(fontWeight = FontWeight.SemiBold), color = ApexPrimary)
-            }
-        }
-        Spacer(modifier = Modifier.height(14.dp))
-    }
-}
-
-@Composable
-private fun ExportOptionRow(
-    icon: ImageVector,
-    iconTint: Color,
-    title: String,
+private fun BentoMetricCard(
+    label: String,
+    value: String,
     subtitle: String,
-    onClick: () -> Unit
+    accent: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(ApexSurfaceContainerHighest)
-            .clickable(onClick = onClick)
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(ApexSurfaceContainer)
+            .border(1.dp, ApexOutlineVariant.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
             .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.weight(1f)) {
-            Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(24.dp))
-            Column {
-                Text(title, style = ApexTextStyles.HeadlineSm, color = ApexOnSurface)
-                Text(subtitle, style = ApexTextStyles.BodySm, color = ApexOnSurfaceVariant)
-            }
-        }
-        Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = ApexOnSurfaceVariant, modifier = Modifier.size(20.dp))
+        Text(label, style = ApexTextStyles.LabelCaps.copy(fontSize = 9.sp), color = ApexOnSurfaceVariant)
+        Text(value, style = ApexTextStyles.HeadlineMd.copy(fontWeight = FontWeight.Black), color = accent)
+        Text(subtitle, style = ApexTextStyles.BodySm.copy(fontSize = 11.sp), color = ApexOnSurfaceVariant)
     }
 }

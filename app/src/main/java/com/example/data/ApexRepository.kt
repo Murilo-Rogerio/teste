@@ -1,39 +1,56 @@
 package com.example.data
 
+import android.content.Context
 import android.util.Log
-import com.example.data.local.ActiveSetEntity
-import com.example.data.local.ApexDao
-import com.example.data.local.MealEntity
-import com.example.data.local.UserStatsEntity
-import com.example.data.local.WorkoutLogEntity
-import com.example.data.local.WorkoutRoutineEntity
+import com.example.R
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.Schema
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
+import kotlin.math.roundToLong
 
 private const val TAG = "ApexRepository"
 
-data class ScannedMealEstimate(
-    val title: String,
-    val description: String,
-    val calories: Int,
-    val proteinG: Int,
-    val carbsG: Int,
-    val fatG: Int,
-    val fiberG: Int
-)
+class ApexRepository(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth = Firebase.auth
+) {
+    // Convenience constructor: always resolves the provisioned named Firestore database ID
+    constructor(context: Context) : this(
+        FirebaseFirestore.getInstance(
+            context.applicationContext.getString(R.string.firestore_database_id)
+        )
+    )
 
-class ApexRepository(private val dao: ApexDao) {
+    private fun requireUserId(expectedUserId: String? = null): String {
+        val uid = auth.currentUser?.uid?.takeIf { it.isNotBlank() }
+            ?: throw IllegalStateException("Usuário precisa estar autenticado com Google antes de acessar o Firestore.")
+        if (expectedUserId != null && expectedUserId != uid) {
+            throw IllegalStateException("Sessão alterada; escrita cross-user bloqueada.")
+        }
+        return uid
+    }
 
-    // Lazily initialized Firebase AI Logic models (never eagerly evaluated at construction)
+    // Lazily initialized Firebase AI Logic models
     private val coachModel by lazy {
         Firebase.ai.generativeModel(
             modelName = "gemini-3.8-flash",
@@ -43,7 +60,7 @@ class ApexRepository(private val dao: ApexDao) {
                         "hipertrofia, treinamento baseado em velocidade (VBT), RPE/RIR, deload e " +
                         "nutrição esportiva de alta performance. Responda sempre em português do Brasil, " +
                         "com precisão técnica, tom motivador e direto, usando formatação limpa e concisa " +
-                        "para leitura rápida na academia."
+                        "baseada estritamente nos dados biométricos e treinos reais do atleta."
                 )
             }
         )
@@ -71,298 +88,731 @@ class ApexRepository(private val dao: ApexDao) {
         )
     }
 
-    val routines: Flow<List<WorkoutRoutineEntity>> = dao.observeRoutines()
-    val activeSets: Flow<List<ActiveSetEntity>> = dao.observeActiveSets()
-    val workoutLogs: Flow<List<WorkoutLogEntity>> = dao.observeWorkoutLogs()
-    val meals: Flow<List<MealEntity>> = dao.observeMeals()
-    val userStats: Flow<UserStatsEntity?> = dao.observeUserStats()
+    // --- REALTIME OBSERVATION STREAMS (USER-SCOPED SUBCOLLECTIONS) ---
 
-    suspend fun ensureSeeded() {
-        val now = System.currentTimeMillis()
-        if (dao.getRoutinesCount() == 0) {
-            dao.insertRoutines(
-                listOf(
-                    WorkoutRoutineEntity(
-                        letter = "A",
-                        statusBadge = "HOJE RECOMENDADO",
-                        title = "Peito, Ombros & Tríceps",
-                        subtitle = "Push Protocol • Foco em Supino Reto e Hipertrofia Deltoide",
-                        exerciseCount = 6,
-                        totalSets = 22,
-                        durationMin = 55,
-                        highlightLabel = "Último Supino Reto:",
-                        highlightValue = "94 kg × 6 reps",
-                        rightTag = "RPE 8.5",
-                        category = "hypertrophy",
-                        isFavorite = true,
-                        isRecommended = true,
-                        ctaLabel = "Iniciar Treino Agora",
-                        createdAt = now
-                    ),
-                    WorkoutRoutineEntity(
-                        letter = "B",
-                        statusBadge = "CONCLUÍDO ONTEM",
-                        title = "Costas, Posterior Ombro & Bíceps",
-                        subtitle = "Pull Protocol • Densidade Dorsal e Puxada Alta",
-                        exerciseCount = 6,
-                        totalSets = 24,
-                        durationMin = 60,
-                        highlightLabel = "Recorde Terra:",
-                        highlightValue = "140 kg × 5 reps",
-                        rightTag = "Descanso Sugerido: 24h",
-                        category = "strength",
-                        isFavorite = false,
-                        isRecommended = false,
-                        ctaLabel = "Repetir",
-                        createdAt = now - 1000L
-                    ),
-                    WorkoutRoutineEntity(
-                        letter = "C",
-                        statusBadge = "PROGRAMADO SÁBADO",
-                        title = "Pernas Completo & Panturrilhas",
-                        subtitle = "Leg Protocol • Cadeia Anterior, Posterior e Isquiotibiais",
-                        exerciseCount = 7,
-                        totalSets = 26,
-                        durationMin = 65,
-                        highlightLabel = "Alvo Agachamento:",
-                        highlightValue = "120 kg",
-                        rightTag = "RPE 9.0",
-                        category = "strength",
-                        isFavorite = false,
-                        isRecommended = false,
-                        ctaLabel = "Antecipar Treino",
-                        createdAt = now - 2000L
-                    )
-                )
-            )
-        }
+    fun observeUserProfile(userId: String): Flow<UserProfile?> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid"
+        emitAll(
+            db.collection("users").document(uid)
+                .snapshots()
+                .map { snapshot ->
+                    if (!snapshot.exists()) null
+                    else snapshot.toObject(UserProfile::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.GET, path, uid)
+                    throw error
+                }
+        )
+    }
 
-        if (dao.getActiveSetsCount() == 0) {
-            dao.insertActiveSets(
-                listOf(
-                    ActiveSetEntity(
-                        setLabel = "W1",
-                        weightKg = 60,
-                        reps = 12,
-                        repsDisplay = "12",
-                        rpe = 6.0,
-                        isCompleted = true,
-                        isActive = false
-                    ),
-                    ActiveSetEntity(
-                        setLabel = "2",
-                        weightKg = 80,
-                        reps = 8,
-                        repsDisplay = "8",
-                        rpe = 8.0,
-                        isCompleted = true,
-                        isActive = false
-                    ),
-                    ActiveSetEntity(
-                        setLabel = "3",
-                        weightKg = 84,
-                        reps = 8,
-                        repsDisplay = "8",
-                        rpe = 8.5,
-                        isCompleted = false,
-                        isActive = true
-                    ),
-                    ActiveSetEntity(
-                        setLabel = "4",
-                        weightKg = 84,
-                        reps = 8,
-                        repsDisplay = "6-8",
-                        rpe = 9.0,
-                        isCompleted = false,
-                        isActive = false
-                    )
-                )
-            )
-        }
+    fun observeRoutines(userId: String): Flow<List<WorkoutRoutine>> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid/routines"
+        emitAll(
+            db.collection("users").document(uid).collection("routines")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.toObjects(WorkoutRoutine::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.LIST, path, uid)
+                    throw error
+                }
+        )
+    }
 
-        if (dao.getWorkoutLogsCount() == 0) {
-            dao.insertWorkoutLogs(
-                listOf(
-                    WorkoutLogEntity(
-                        title = "Push A — Peito & Deltóides",
-                        metaLine = "Hoje, 07:15 • 62 min • RPE 8.5",
-                        tonnageKg = 11420,
-                        seriesLabel = "22 Séries",
-                        isRecentHighlight = true,
-                        iconType = "push",
-                        timestamp = now
-                    ),
-                    WorkoutLogEntity(
-                        title = "Pull A — Dorsal & Bíceps",
-                        metaLine = "Ontem, 18:30 • 58 min • RPE 8.0",
-                        tonnageKg = 10850,
-                        seriesLabel = "20 Séries",
-                        isRecentHighlight = false,
-                        iconType = "pull",
-                        timestamp = now - 86_400_000L
-                    ),
-                    WorkoutLogEntity(
-                        title = "Legs A — Quadríceps Foco",
-                        metaLine = "Há 3 dias • 65 min • RPE 9.0",
-                        tonnageKg = 14120,
-                        seriesLabel = "24 Séries",
-                        isRecentHighlight = false,
-                        iconType = "legs",
-                        timestamp = now - 259_200_000L
-                    )
-                )
-            )
-        }
+    fun observeActiveSets(userId: String): Flow<List<ActiveSet>> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid/active_sets"
+        emitAll(
+            db.collection("users").document(uid).collection("active_sets")
+                .orderBy("setOrder", Query.Direction.ASCENDING)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.toObjects(ActiveSet::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.LIST, path, uid)
+                    throw error
+                }
+        )
+    }
 
-        if (dao.getMealsCount() == 0) {
-            dao.insertMeals(
-                listOf(
-                    MealEntity(
-                        timeLabel = "07:30",
-                        title = "Café Pré-Treino Anabólico",
-                        description = "Ovos, Aveia, Morangos • 620 kcal",
-                        calories = 620,
-                        proteinG = 45,
-                        carbsG = 75,
-                        fatG = 15,
-                        fiberG = 8,
-                        isCompleted = true,
-                        imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuAIe3upyBLQRZjKbDlr5eBM9a_MiZEfdyyGItDqYdpYheYJ49_Px_cf15TZobkAWHbX-E-uDkfldDSShwQkomTPNjD7iCcevWjyjulohTS-9C_jvffcZTmOEefORLr0lLiGJVCDj3TtT-kJqIlLOHCIVM-3D781gDQTVuEOAVwJmDYDdR37wCsA9VWYeKGSw4C8f6P3_ri-Rnvc4AY3KOsCoPm5N30z45n0zo2bxn8"
-                    ),
-                    MealEntity(
-                        timeLabel = "10:45",
-                        title = "Pós-Treino Imediato",
-                        description = "Shake Isolado + Creatina + Dextrose • 380 kcal",
-                        calories = 380,
-                        proteinG = 40,
-                        carbsG = 50,
-                        fatG = 2,
-                        fiberG = 2,
-                        isCompleted = true,
-                        imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuBJqb2LIOr8jyppWptQC2C8m_Df8-6OgganiCrvXloJv0_TUf4izVt4B-bTphKw_ymhRkyva1ZX8CQ2W92d-PoIhLANxSV_1zDs-sdC_iNaljIYWXuuHVRH_i8SrD4uxWQK72ncaBZxNsOJrQ8dK1MGQZZJ4B8NV1h-pWJaEYS7utyMHG4nxzYlgP2hepXfQ9bgKbjS2PES3nmkW037S0P71UKtqO-XPSRBTXDJr-4"
-                    ),
-                    MealEntity(
-                        timeLabel = "13:15",
-                        title = "Almoço Densidade Alta",
-                        description = "Arroz, Frango Grelhado, Brócolis • 850 kcal",
-                        calories = 850,
-                        proteinG = 55,
-                        carbsG = 95,
-                        fatG = 22,
-                        fiberG = 12,
-                        isCompleted = true,
-                        imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuASu5tX4bbUJV1etD9_V5lQFz4DtHHGG3-P-D0Rk-iR-DkPTmLWC_9w8ec5k6hqA6fTsMfbCIKI0EDvytIRggVshiNXOKXsSORUdhDoVTRhHhWlg2xcS32Ef9nmPDYc3Q5e81p0wBPysKgmdbw2bcTCcSzxn_yLJsTeK98N1RM3oiwTQa5ljxZzdwxwtLU7tJrAaDbeZOBnUV0M9EUs9YmK4eA0qKc44_IY0z9SH5I"
-                    ),
-                    MealEntity(
-                        timeLabel = "16:45",
-                        title = "Lanche Anabólico da Tarde",
-                        description = "Iogurte Grego, Whey & Castanhas • 420 kcal",
-                        calories = 420,
-                        proteinG = 32,
-                        carbsG = 35,
-                        fatG = 14,
-                        fiberG = 5,
-                        isCompleted = true,
-                        imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuBrXDcMxvkvKgFX4HMbIwpiu9mkF6qg1-kPGm5oNP5NwcEPu0tLsuI5Lv6EB6AgQQC54oqCIyripBGhZMuYEvSYYCyyyiG8YHI9gOkao4b5wZifWRLH1lcFtCOtaWsniChXN_GhIJQMYb2_NI0cQPBQ77VCHPJfmdvzV26nCaMxj8LyRqz_pLh132apGjgE4gVu_G8HFutscHEACZtET-9-YHAf81VQ30LSN-fJMiY"
-                    ),
-                    MealEntity(
-                        timeLabel = "20:30",
-                        title = "Jantar Regenerativo Hipertrófico",
-                        description = "Salmão / Patinho, Batata Doce • 580 kcal",
-                        calories = 580,
-                        proteinG = 45,
-                        carbsG = 55,
-                        fatG = 15,
-                        fiberG = 5,
-                        isCompleted = false,
-                        imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCVCQrc1cYuAxElpTroS5n_ySBlw6vma1wgG1UbEI_QTtaYTZw96H_yiWo-5gwOQTwahDV41mMxbKOIx7X0C8yKXjXuCTwcGgfJtRl24wMFdxBo24DpFPw0uGPpW4YVACAaNHm0Z-K9fGEpwmqNOMas2dasdbInnbHGKoq2E6egQ1eLSSNe4CH9J3QbZShUflgTffW-7GLOMdnZuvjMKwGbrRnnkjQ4HAAXQmulZGQ"
-                    )
-                )
-            )
-        }
+    fun observeWorkoutLogs(userId: String): Flow<List<WorkoutLog>> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid/workout_logs"
+        emitAll(
+            db.collection("users").document(uid).collection("workout_logs")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.toObjects(WorkoutLog::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.LIST, path, uid)
+                    throw error
+                }
+        )
+    }
 
-        if (dao.getUserStatsOnce() == null) {
-            dao.upsertUserStats(UserStatsEntity())
+    fun observeMeals(userId: String): Flow<List<MealRecord>> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid/meals"
+        emitAll(
+            db.collection("users").document(uid).collection("meals")
+                .orderBy("createdAt", Query.Direction.ASCENDING)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.toObjects(MealRecord::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.LIST, path, uid)
+                    throw error
+                }
+        )
+    }
+
+    fun observeWeightLogs(userId: String): Flow<List<BodyMeasurementLog>> = flow {
+        val uid = requireUserId(userId)
+        val path = "users/$uid/weight_logs"
+        emitAll(
+            db.collection("users").document(uid).collection("weight_logs")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.toObjects(BodyMeasurementLog::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+                }
+                .catch { error ->
+                    logStreamErrorIfActive(error, OperationType.LIST, path, uid)
+                    throw error
+                }
+        )
+    }
+
+    private fun logStreamErrorIfActive(
+        error: Throwable,
+        operationType: OperationType,
+        path: String,
+        uid: String
+    ) {
+        val firestoreError = generateSequence(error) { it.cause }
+            .filterIsInstance<FirebaseFirestoreException>()
+            .firstOrNull()
+        if (firestoreError == null && error is CancellationException) return
+        val exceptionToLog = firestoreError ?: (error as? Exception)
+        if (exceptionToLog != null && auth.currentUser?.uid == uid) {
+            handleFirestoreError(exceptionToLog, operationType, path)
         }
     }
 
+    // --- PROFILE & BIOMETRICS MUTATIONS ---
+
+    suspend fun saveInitialProfileAndBiometrics(
+        userId: String,
+        username: String,
+        displayName: String,
+        photoUrl: String,
+        sex: String,
+        age: Int,
+        weightKg: Double,
+        heightCm: Double,
+        waistCm: Double,
+        chestCm: Double,
+        armCm: Double,
+        thighCm: Double,
+        bodyFatPercent: Double,
+        activityFactor: Double,
+        goalDeltaKcal: Int,
+        goalLabel: String,
+        isExistingProfile: Boolean
+    ): Result<Unit> {
+        var docPath = "users/$userId"
+        return try {
+            val uid = requireUserId(userId)
+            val cleanUsername = username.trim().removePrefix("@").take(30)
+            require(cleanUsername.length in 3..30) { "Nome de usuário deve ter entre 3 e 30 caracteres." }
+            val cleanDisplayName = displayName.trim().ifBlank { cleanUsername }.take(60)
+            val clampedSex = if (sex == "F") "F" else "M"
+            val clampedAge = age.coerceIn(12, 100).toLong()
+            val clampedWeight = weightKg.coerceIn(30.0, 300.0)
+            val clampedHeight = heightCm.coerceIn(100.0, 250.0)
+            val clampedWaist = waistCm.coerceIn(0.0, 200.0)
+            val clampedChest = chestCm.coerceIn(0.0, 200.0)
+            val clampedArm = armCm.coerceIn(0.0, 100.0)
+            val clampedThigh = thighCm.coerceIn(0.0, 150.0)
+            val clampedBf = bodyFatPercent.coerceIn(0.0, 60.0)
+            val clampedActivity = activityFactor.coerceIn(1.2, 1.9)
+            val clampedGoalDelta = goalDeltaKcal.coerceIn(-600, 600).toLong()
+            val cleanGoalLabel = goalLabel.trim().ifBlank { "Manutenção" }.take(40)
+            val waterGoalMl = (clampedWeight * 35.0).roundToLong().coerceIn(1500L, 6000L)
+
+            val userRef = db.collection("users").document(uid)
+            docPath = userRef.path
+
+            if (isExistingProfile) {
+                val updatePayload = mapOf(
+                    "username" to cleanUsername,
+                    "displayName" to cleanDisplayName,
+                    "photoUrl" to photoUrl.take(500),
+                    "sex" to clampedSex,
+                    "age" to clampedAge,
+                    "weightKg" to clampedWeight,
+                    "heightCm" to clampedHeight,
+                    "waistCm" to clampedWaist,
+                    "chestCm" to clampedChest,
+                    "armCm" to clampedArm,
+                    "thighCm" to clampedThigh,
+                    "bodyFatPercent" to clampedBf,
+                    "activityFactor" to clampedActivity,
+                    "goalDeltaKcal" to clampedGoalDelta,
+                    "goalLabel" to cleanGoalLabel,
+                    "onboardingCompleted" to true,
+                    "waterGoalMl" to waterGoalMl,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+                userRef.update(updatePayload).await()
+            } else {
+                val createPayload = mapOf(
+                    "userId" to uid,
+                    "username" to cleanUsername,
+                    "displayName" to cleanDisplayName,
+                    "photoUrl" to photoUrl.take(500),
+                    "sex" to clampedSex,
+                    "age" to clampedAge,
+                    "weightKg" to clampedWeight,
+                    "heightCm" to clampedHeight,
+                    "waistCm" to clampedWaist,
+                    "chestCm" to clampedChest,
+                    "armCm" to clampedArm,
+                    "thighCm" to clampedThigh,
+                    "bodyFatPercent" to clampedBf,
+                    "activityFactor" to clampedActivity,
+                    "goalDeltaKcal" to clampedGoalDelta,
+                    "goalLabel" to cleanGoalLabel,
+                    "onboardingCompleted" to true,
+                    "level" to 1L,
+                    "currentXp" to 0L,
+                    "nextLevelXp" to 500L,
+                    "streakDays" to 0L,
+                    "waterMl" to 0L,
+                    "waterGoalMl" to waterGoalMl,
+                    "activeWorkoutName" to "",
+                    "activeWorkoutSubtitle" to "",
+                    "activeExerciseName" to "",
+                    "exerciseNotes" to "",
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+                userRef.set(createPayload).await()
+            }
+
+            // Record initial / updated body measurement snapshot in weight_logs
+            val weightLogRef = userRef.collection("weight_logs").document()
+            docPath = weightLogRef.path
+            weightLogRef.set(
+                mapOf(
+                    "userId" to uid,
+                    "weightKg" to clampedWeight,
+                    "waistCm" to clampedWaist,
+                    "bodyFatPercent" to clampedBf,
+                    "note" to if (isExistingProfile) "Atualização biométrica" else "Avaliação inicial da conta",
+                    "createdAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, if (isExistingProfile) OperationType.UPDATE else OperationType.CREATE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addBodyMeasurementEntry(
+        userId: String,
+        weightKg: Double,
+        waistCm: Double,
+        bodyFatPercent: Double,
+        note: String
+    ): Result<Unit> {
+        var docPath = "users/$userId/weight_logs"
+        return try {
+            val uid = requireUserId(userId)
+            val clampedWeight = weightKg.coerceIn(30.0, 300.0)
+            val clampedWaist = waistCm.coerceIn(0.0, 200.0)
+            val clampedBf = bodyFatPercent.coerceIn(0.0, 60.0)
+            val waterGoalMl = (clampedWeight * 35.0).roundToLong().coerceIn(1500L, 6000L)
+
+            val userRef = db.collection("users").document(uid)
+            val entryRef = userRef.collection("weight_logs").document()
+            docPath = entryRef.path
+            entryRef.set(
+                mapOf(
+                    "userId" to uid,
+                    "weightKg" to clampedWeight,
+                    "waistCm" to clampedWaist,
+                    "bodyFatPercent" to clampedBf,
+                    "note" to note.trim().take(140),
+                    "createdAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+
+            docPath = userRef.path
+            userRef.update(
+                mapOf(
+                    "weightKg" to clampedWeight,
+                    "waistCm" to clampedWaist,
+                    "bodyFatPercent" to clampedBf,
+                    "waterGoalMl" to waterGoalMl,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    // --- ROUTINES MUTATIONS ---
+
     suspend fun addRoutine(
+        userId: String,
+        existingCount: Int,
         name: String,
+        exerciseNames: List<String>,
         targetSets: Int,
         targetReps: String,
         targetRpe: Double,
-        targetRestSeconds: Int
-    ) {
-        val count = dao.getRoutinesCount()
-        val nextLetter = ('A' + (count % 26)).toString()
-        dao.insertRoutine(
-            WorkoutRoutineEntity(
-                letter = nextLetter,
-                statusBadge = "RECÉM-CRIADA",
-                title = name.ifBlank { "Nova Ficha Personalizada" },
-                subtitle = "Meta: Reps $targetReps • RPE ${String.format("%.1f", targetRpe)} • Descanso ${targetRestSeconds}s",
-                exerciseCount = 5,
-                totalSets = targetSets * 5,
-                durationMin = 50,
-                highlightLabel = "Alvo Inicial:",
-                highlightValue = "$targetSets séries × $targetReps reps",
-                rightTag = "RPE ${String.format("%.1f", targetRpe)}",
-                category = if (targetRpe >= 8.5) "strength" else "hypertrophy",
-                isFavorite = false,
-                isRecommended = false,
-                ctaLabel = "Iniciar Treino",
-                createdAt = System.currentTimeMillis()
-            )
-        )
+        targetRestSeconds: Int,
+        category: String
+    ): Result<Unit> {
+        var docPath = "users/$userId/routines"
+        return try {
+            val uid = requireUserId(userId)
+            val docRef = db.collection("users").document(uid).collection("routines").document()
+            docPath = docRef.path
+            val letter = ('A' + (existingCount % 26)).toString()
+            val cleanTitle = name.trim().ifBlank { "Treino $letter" }.take(80)
+            val cleanExercises = exerciseNames.map { it.trim().take(80) }.filter { it.isNotEmpty() }.take(20)
+            val safeCategory = if (category in listOf("hypertrophy", "strength", "ppl", "upper_lower", "full_body")) {
+                category
+            } else {
+                "hypertrophy"
+            }
+            val clampedSets = targetSets.coerceIn(1, 20).toLong()
+            val cleanReps = targetReps.trim().ifBlank { "8-12" }.take(20)
+            val clampedRpe = targetRpe.coerceIn(1.0, 10.0)
+            val clampedRest = targetRestSeconds.coerceIn(15, 600).toLong()
+            val subtitle = "Alvo: ${clampedSets}x$cleanReps • RPE ${String.format("%.1f", clampedRpe)} • Descanso ${clampedRest}s"
+
+            docRef.set(
+                mapOf(
+                    "userId" to uid,
+                    "letter" to letter,
+                    "statusBadge" to "PRONTA",
+                    "title" to cleanTitle,
+                    "subtitle" to subtitle.take(160),
+                    "exerciseNames" to cleanExercises,
+                    "targetSets" to clampedSets,
+                    "targetReps" to cleanReps,
+                    "targetRpe" to clampedRpe,
+                    "targetRestSeconds" to clampedRest,
+                    "category" to safeCategory,
+                    "favorite" to false,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.CREATE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun updateActiveSet(set: ActiveSetEntity) = dao.updateActiveSet(set)
+    suspend fun toggleRoutineFavorite(userId: String, routine: WorkoutRoutine): Result<Unit> {
+        val docPath = "users/$userId/routines/${routine.id}"
+        return try {
+            val uid = requireUserId(userId)
+            require(routine.id.isNotBlank()) { "Routine ID obrigatório." }
+            db.collection("users").document(uid).collection("routines").document(routine.id)
+                .update(
+                    mapOf(
+                        "favorite" to !routine.favorite,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.UPDATE, docPath)
+            Result.failure(e)
+        }
+    }
 
-    suspend fun addActiveSet(nextNumber: Int, defaultWeight: Int) {
-        dao.insertActiveSet(
-            ActiveSetEntity(
-                setLabel = nextNumber.toString(),
-                weightKg = defaultWeight,
-                reps = 8,
-                repsDisplay = "8",
-                rpe = 8.5,
-                isCompleted = false,
-                isActive = false
+    suspend fun deleteRoutine(userId: String, routineId: String): Result<Unit> {
+        val docPath = "users/$userId/routines/$routineId"
+        return try {
+            val uid = requireUserId(userId)
+            require(routineId.isNotBlank()) { "Routine ID obrigatório." }
+            db.collection("users").document(uid).collection("routines").document(routineId)
+                .delete().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.DELETE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    // --- ACTIVE WORKOUT SESSION & SETS ---
+
+    suspend fun startWorkoutSessionFromRoutine(
+        userId: String,
+        routine: WorkoutRoutine,
+        existingActiveSets: List<ActiveSet>
+    ): Result<Unit> {
+        var docPath = "users/$userId"
+        return try {
+            val uid = requireUserId(userId)
+            val userRef = db.collection("users").document(uid)
+            val firstExercise = routine.exerciseNames.firstOrNull()?.takeIf { it.isNotBlank() } ?: routine.title
+            val initialReps = routine.targetReps.takeWhile { it.isDigit() }.toLongOrNull()?.coerceIn(1L, 50L) ?: 10L
+            val setsCount = routine.targetSets.toInt().coerceIn(1, 8)
+
+            // Clear old active sets
+            val batch = db.batch()
+            existingActiveSets.forEach { oldSet ->
+                if (oldSet.id.isNotBlank()) {
+                    batch.delete(userRef.collection("active_sets").document(oldSet.id))
+                }
+            }
+
+            // Create fresh sets starting at 0kg so user enters their own real load
+            for (i in 1..setsCount) {
+                val setRef = userRef.collection("active_sets").document()
+                batch.set(
+                    setRef,
+                    mapOf(
+                        "userId" to uid,
+                        "exerciseName" to firstExercise.take(80),
+                        "setOrder" to i.toLong(),
+                        "setLabel" to i.toString(),
+                        "weightKg" to 0.0,
+                        "reps" to initialReps,
+                        "rpe" to routine.targetRpe.coerceIn(1.0, 10.0),
+                        "completed" to false,
+                        "active" to (i == 1),
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                )
+            }
+
+            batch.update(
+                userRef,
+                mapOf(
+                    "activeWorkoutName" to routine.title.take(80),
+                    "activeWorkoutSubtitle" to routine.subtitle.take(160),
+                    "activeExerciseName" to firstExercise.take(80),
+                    "exerciseNotes" to "",
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
             )
-        )
+            docPath = "users/$uid/active_sets"
+            batch.commit().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun startFreeWorkoutWithExercise(
+        userId: String,
+        exerciseName: String
+    ): Result<Unit> {
+        var docPath = "users/$userId/active_sets"
+        return try {
+            val uid = requireUserId(userId)
+            val cleanName = exerciseName.trim().ifBlank { "Exercício Livre" }.take(80)
+            val userRef = db.collection("users").document(uid)
+            val batch = db.batch()
+            for (i in 1..3) {
+                val setRef = userRef.collection("active_sets").document()
+                batch.set(
+                    setRef,
+                    mapOf(
+                        "userId" to uid,
+                        "exerciseName" to cleanName,
+                        "setOrder" to i.toLong(),
+                        "setLabel" to i.toString(),
+                        "weightKg" to 0.0,
+                        "reps" to 10L,
+                        "rpe" to 8.0,
+                        "completed" to false,
+                        "active" to (i == 1),
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                )
+            }
+            batch.update(
+                userRef,
+                mapOf(
+                    "activeWorkoutName" to "Treino Livre",
+                    "activeWorkoutSubtitle" to "Sessão iniciada agora",
+                    "activeExerciseName" to cleanName,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            )
+            batch.commit().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateActiveSet(
+        userId: String,
+        setId: String,
+        weightKg: Double,
+        reps: Long,
+        rpe: Double,
+        completed: Boolean,
+        active: Boolean
+    ): Result<Unit> {
+        val docPath = "users/$userId/active_sets/$setId"
+        return try {
+            val uid = requireUserId(userId)
+            require(setId.isNotBlank()) { "Set ID obrigatório." }
+            db.collection("users").document(uid).collection("active_sets").document(setId)
+                .update(
+                    mapOf(
+                        "weightKg" to weightKg.coerceIn(0.0, 1000.0),
+                        "reps" to reps.coerceIn(1L, 200L),
+                        "rpe" to rpe.coerceIn(1.0, 10.0),
+                        "completed" to completed,
+                        "active" to active,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.UPDATE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addActiveSet(
+        userId: String,
+        exerciseName: String,
+        nextOrder: Int,
+        defaultWeightKg: Double,
+        defaultReps: Long
+    ): Result<Unit> {
+        var docPath = "users/$userId/active_sets"
+        return try {
+            val uid = requireUserId(userId)
+            val ref = db.collection("users").document(uid).collection("active_sets").document()
+            docPath = ref.path
+            ref.set(
+                mapOf(
+                    "userId" to uid,
+                    "exerciseName" to exerciseName.trim().ifBlank { "Exercício" }.take(80),
+                    "setOrder" to nextOrder.coerceIn(1, 50).toLong(),
+                    "setLabel" to nextOrder.toString().take(10),
+                    "weightKg" to defaultWeightKg.coerceIn(0.0, 1000.0),
+                    "reps" to defaultReps.coerceIn(1L, 200L),
+                    "rpe" to 8.0,
+                    "completed" to false,
+                    "active" to false,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.CREATE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteActiveSet(userId: String, setId: String): Result<Unit> {
+        val docPath = "users/$userId/active_sets/$setId"
+        return try {
+            val uid = requireUserId(userId)
+            require(setId.isNotBlank()) { "Set ID obrigatório." }
+            db.collection("users").document(uid).collection("active_sets").document(setId)
+                .delete().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.DELETE, docPath)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateActiveExerciseAndNotes(
+        userId: String,
+        activeExerciseName: String,
+        notes: String
+    ): Result<Unit> {
+        val docPath = "users/$userId"
+        return try {
+            val uid = requireUserId(userId)
+            db.collection("users").document(uid)
+                .update(
+                    mapOf(
+                        "activeExerciseName" to activeExerciseName.trim().take(80),
+                        "exerciseNotes" to notes.take(500),
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.UPDATE, docPath)
+            Result.failure(e)
+        }
     }
 
     suspend fun finishWorkoutSession(
-        title: String,
-        durationMinutes: Int,
-        totalVolumeKg: Int,
-        completedSetsCount: Int
-    ) {
-        dao.insertWorkoutLog(
-            WorkoutLogEntity(
-                title = title,
-                metaLine = "Agora • $durationMinutes min • RPE 8.5",
-                tonnageKg = totalVolumeKg,
-                seriesLabel = "$completedSetsCount Séries",
-                isRecentHighlight = true,
-                iconType = "push",
-                timestamp = System.currentTimeMillis()
+        userId: String,
+        profile: UserProfile,
+        activeSets: List<ActiveSet>,
+        durationMinutes: Int
+    ): Result<Unit> {
+        var docPath = "users/$userId/workout_logs"
+        return try {
+            val uid = requireUserId(userId)
+            val completedSetsList = activeSets.filter { it.completed }
+            val setsForStats = if (completedSetsList.isNotEmpty()) completedSetsList else activeSets
+            val tonnage = setsForStats.sumOf { (it.weightKg * it.reps).roundToLong() }.coerceIn(0L, 1_000_000L)
+            val bestSet = setsForStats.maxByOrNull { it.weightKg }
+            val avgRpe = if (setsForStats.isNotEmpty()) setsForStats.map { it.rpe }.average() else 8.0
+            val title = profile.activeWorkoutName.ifBlank {
+                bestSet?.exerciseName ?: "Sessão de Treino"
+            }.take(100)
+            val safeDuration = durationMinutes.coerceIn(1, 600).toLong()
+            val metaLine = "${safeDuration} min • RPE ${String.format("%.1f", avgRpe)} • ${setsForStats.size} séries"
+
+            val lowerTitle = title.lowercase()
+            val iconType = when {
+                lowerTitle.contains("perna") || lowerTitle.contains("leg") || lowerTitle.contains("agach") -> "legs"
+                lowerTitle.contains("costa") || lowerTitle.contains("pull") || lowerTitle.contains("dorsal") -> "pull"
+                lowerTitle.contains("peito") || lowerTitle.contains("push") || lowerTitle.contains("supino") -> "push"
+                else -> "custom"
+            }
+
+            // Compute XP & level progression cleanly
+            val earnedXp = (80L + (setsForStats.size * 15L)).coerceAtMost(350L)
+            var nextXp = profile.currentXp + earnedXp
+            var nextLevel = profile.level.coerceAtLeast(1L)
+            var nextLevelGoal = profile.nextLevelXp.coerceAtLeast(500L)
+            while (nextXp >= nextLevelGoal && nextLevel < 999L) {
+                nextXp -= nextLevelGoal
+                nextLevel += 1L
+                nextLevelGoal = (nextLevelGoal + 250L).coerceAtMost(1_000_000L)
+            }
+
+            val userRef = db.collection("users").document(uid)
+            val logRef = userRef.collection("workout_logs").document()
+            docPath = logRef.path
+            val batch = db.batch()
+            batch.set(
+                logRef,
+                mapOf(
+                    "userId" to uid,
+                    "title" to title,
+                    "metaLine" to metaLine.take(120),
+                    "tonnageKg" to tonnage,
+                    "completedSets" to setsForStats.size.toLong(),
+                    "durationMinutes" to safeDuration,
+                    "bestExercise" to (bestSet?.exerciseName ?: "").take(80),
+                    "bestWeightKg" to (bestSet?.weightKg ?: 0.0).coerceIn(0.0, 1000.0),
+                    "bestReps" to (bestSet?.reps ?: 0L).coerceIn(0L, 200L),
+                    "iconType" to iconType,
+                    "createdAt" to FieldValue.serverTimestamp()
+                )
             )
-        )
-        val stats = dao.getUserStatsOnce() ?: UserStatsEntity()
-        dao.upsertUserStats(
-            stats.copy(
-                currentXp = (stats.currentXp + 180).coerceAtMost(stats.nextLevelXp),
-                weeklyBaseVolumeKg = stats.weeklyBaseVolumeKg + totalVolumeKg
+            // Clear active sets once saved
+            activeSets.forEach { set ->
+                if (set.id.isNotBlank()) {
+                    batch.delete(userRef.collection("active_sets").document(set.id))
+                }
+            }
+            // Update user progress
+            batch.update(
+                userRef,
+                mapOf(
+                    "level" to nextLevel,
+                    "currentXp" to nextXp,
+                    "nextLevelXp" to nextLevelGoal,
+                    "streakDays" to (profile.streakDays + 1L).coerceAtMost(9999L),
+                    "activeWorkoutName" to "",
+                    "activeWorkoutSubtitle" to "",
+                    "activeExerciseName" to "",
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
             )
-        )
+            batch.commit().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun toggleMeal(meal: MealEntity) {
-        dao.updateMeal(meal.copy(isCompleted = !meal.isCompleted))
+    // --- NUTRITION & HYDRATION MUTATIONS ---
+
+    suspend fun toggleMeal(userId: String, meal: MealRecord): Result<Unit> {
+        val docPath = "users/$userId/meals/${meal.id}"
+        return try {
+            val uid = requireUserId(userId)
+            require(meal.id.isNotBlank()) { "Meal ID obrigatório." }
+            db.collection("users").document(uid).collection("meals").document(meal.id)
+                .update(
+                    mapOf(
+                        "completed" to !meal.completed,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.UPDATE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun addCustomMeal(
+    suspend fun addMeal(
+        userId: String,
         timeLabel: String,
         title: String,
         description: String,
@@ -371,46 +821,79 @@ class ApexRepository(private val dao: ApexDao) {
         carbsG: Int,
         fatG: Int,
         fiberG: Int
-    ) {
-        dao.insertMeal(
-            MealEntity(
-                timeLabel = timeLabel,
-                title = title,
-                description = "$description • $calories kcal",
-                calories = calories,
-                proteinG = proteinG,
-                carbsG = carbsG,
-                fatG = fatG,
-                fiberG = fiberG,
-                isCompleted = true,
-                imageUrl = ""
-            )
-        )
+    ): Result<Unit> {
+        var docPath = "users/$userId/meals"
+        return try {
+            val uid = requireUserId(userId)
+            val ref = db.collection("users").document(uid).collection("meals").document()
+            docPath = ref.path
+            ref.set(
+                mapOf(
+                    "userId" to uid,
+                    "timeLabel" to timeLabel.trim().ifBlank { "12:00" }.take(10),
+                    "title" to title.trim().ifBlank { "Refeição" }.take(80),
+                    "description" to description.trim().take(200),
+                    "calories" to calories.coerceIn(0, 10000).toLong(),
+                    "proteinG" to proteinG.coerceIn(0, 1000).toLong(),
+                    "carbsG" to carbsG.coerceIn(0, 1000).toLong(),
+                    "fatG" to fatG.coerceIn(0, 1000).toLong(),
+                    "fiberG" to fiberG.coerceIn(0, 300).toLong(),
+                    "completed" to true,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.CREATE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun addWater(deltaMl: Int) {
-        val stats = dao.getUserStatsOnce() ?: UserStatsEntity()
-        val updated = (stats.waterMl + deltaMl).coerceIn(0, 6000)
-        dao.upsertUserStats(stats.copy(waterMl = updated))
+    suspend fun deleteMeal(userId: String, mealId: String): Result<Unit> {
+        val docPath = "users/$userId/meals/$mealId"
+        return try {
+            val uid = requireUserId(userId)
+            require(mealId.isNotBlank()) { "Meal ID obrigatório." }
+            db.collection("users").document(uid).collection("meals").document(mealId)
+                .delete().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.DELETE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun updateExerciseNotes(notes: String) {
-        val stats = dao.getUserStatsOnce() ?: UserStatsEntity()
-        dao.upsertUserStats(stats.copy(exerciseNotes = notes))
+    suspend fun updateWaterIntake(userId: String, newWaterMl: Long): Result<Unit> {
+        val docPath = "users/$userId"
+        return try {
+            val uid = requireUserId(userId)
+            db.collection("users").document(uid)
+                .update(
+                    mapOf(
+                        "waterMl" to newWaterMl.coerceIn(0L, 10000L),
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.UPDATE, docPath)
+            Result.failure(e)
+        }
     }
 
-    suspend fun updateActiveWorkoutMeta(name: String, subtitle: String) {
-        val stats = dao.getUserStatsOnce() ?: UserStatsEntity()
-        dao.upsertUserStats(stats.copy(activeWorkoutName = name, activeWorkoutSubtitle = subtitle))
-    }
+    // --- FIREBASE AI LOGIC (GEMINI) ---
 
-    /**
-     * Streams a real Gemini coaching response via Firebase AI Logic.
-     */
     fun streamCoachResponse(
         userQuery: String,
         mode: String,
-        activeTelemetrySummary: String
+        athleteContextSummary: String
     ): Flow<String> = flow {
         val modeDirective = when (mode) {
             "quick" -> "Modo RÁPIDO / ACADEMIA: seja ultra-direto, máximo 3 tópicos práticos imediatos para executar entre séries."
@@ -419,7 +902,7 @@ class ApexRepository(private val dao: ApexDao) {
         }
         val prompt = """
             $modeDirective
-            Telemetria da sessão ativa do atleta: $activeTelemetrySummary
+            Dados reais do atleta: $athleteContextSummary
             
             Pergunta do atleta: $userQuery
         """.trimIndent()
@@ -449,14 +932,11 @@ class ApexRepository(private val dao: ApexDao) {
         }
     }
 
-    /**
-     * Requests a fresh Gemini plateau/deload heuristic summary based on athlete tonnage.
-     */
-    suspend fun analyzePlateauWithGemini(tonnageSummary: String): String {
+    suspend fun analyzePlateauWithGemini(athleteAndLogsSummary: String): String {
         return try {
             val response = withTimeout(60_000L) {
                 coachModel.generateContent(
-                    "Analise brevemente (em 2 frases diretas) este histórico de treino e indique o ajuste ideal de sobrecarga ou deload para Desenvolvimento Militar estagnado em 28 kg: $tonnageSummary"
+                    "Analise brevemente (em 2 ou 3 frases diretas em português) os dados biométricos e histórico real deste atleta e sugira a melhor estratégia de progressão de carga ou montagem de treino: $athleteAndLogsSummary"
                 )
             }
             response.text?.takeIf { it.isNotBlank() }
@@ -472,9 +952,6 @@ class ApexRepository(private val dao: ApexDao) {
         }
     }
 
-    /**
-     * Estimates calories and macronutrients for a described meal using Gemini Structured Output.
-     */
     suspend fun estimateMealMacrosWithGemini(mealDescription: String): ScannedMealEstimate {
         return try {
             val response = withTimeout(60_000L) {
@@ -487,10 +964,10 @@ class ApexRepository(private val dao: ApexDao) {
             ScannedMealEstimate(
                 title = json.optString("title", "Refeição Registrada"),
                 description = json.optString("description", mealDescription),
-                calories = json.optInt("calories", 450),
-                proteinG = json.optInt("proteinG", 35),
-                carbsG = json.optInt("carbsG", 45),
-                fatG = json.optInt("fatG", 12),
+                calories = json.optInt("calories", 400),
+                proteinG = json.optInt("proteinG", 30),
+                carbsG = json.optInt("carbsG", 40),
+                fatG = json.optInt("fatG", 10),
                 fiberG = json.optInt("fiberG", 5)
             )
         } catch (e: TimeoutCancellationException) {
