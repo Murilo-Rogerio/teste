@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#131b2e", "on-error-container": "#ffdad6", "on-tertiary-fixed": "#001c39", "on-surface-variant": "#bdc8d1", "outline-variant": "#3e484f", "error-container": "#93000a", "secondary-fixed": "#dbe1ff", "surface-container-highest": "#2d3449", "primary-fixed": "#c4e7ff", "on-background": "#dae2fd", "on-primary-container": "#004965", "surface-tint": "#7bd0ff", "surface-dim": "#0b1326", "inverse-surface": "#dae2fd", "surface": "#0b1326", "on-primary-fixed-variant": "#004c69", "primary": "#8ed5ff", "secondary-container": "#0053db", "secondary-fixed-dim": "#b4c5ff", "tertiary-container": "#7bb4ff", "on-primary": "#00354a", "on-secondary": "#002a78", "on-error": "#690005", "surface-variant": "#2d3449", "surface-bright": "#31394d", "on-secondary-container": "#cdd7ff", "on-tertiary-container": "#00457e", "tertiary-fixed-dim": "#a4c9ff", "on-surface": "#dae2fd", "error": "#ffb4ab", "inverse-on-surface": "#283044", "on-secondary-fixed-variant": "#003ea8", "on-tertiary-fixed-variant": "#004883", "surface-container-high": "#222a3d", "primary-container": "#38bdf8", "on-secondary-fixed": "#00174b", "background": "#0b1326", "surface-container-lowest": "#060e20", "secondary": "#b4c5ff", "primary-fixed-dim": "#7bd0ff", "tertiary": "#afcfff", "tertiary-fixed": "#d4e3ff", "inverse-primary": "#00668a", "outline": "#87929a", "surface-container": "#171f33", "on-tertiary": "#00315d", "on-primary-fixed": "#001e2c" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2.25rem", "gutter-desktop": "1.5rem", "margin-desktop": "2.5rem", "space-lg": "1.5rem", "margin": "1rem", "gutter": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-interactive": ["Plus Jakarta Sans"], "label-caps": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "metric-huge": ["Plus Jakarta Sans"], "metric-lg": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "body-md": ["Inter"], "metric-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "label-interactive": ["14px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600"}], "label-caps": ["11px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700"}], "display-hero": ["56px", {"lineHeight": "60px", "letterSpacing": "-0.03em", "fontWeight": "800"}], "display-hero-mobile": ["40px", {"lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "800"}], "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400"}], "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "metric-huge": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "800"}], "metric-lg": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}], "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}], "metric-md": ["20px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}], "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700"}], "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}] } } } }</script><style>body { min-height: max(884px, 100dvh); }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.4)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><img alt="Apex Performance Logo" class="h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(56,189,248,0.45)]" src="https://lh3.googleusercontent.com/aida/ALJJyrDiljOa52qcWyUank09X9IBfROuBWTTUvRDa3nW1bTpE3_y8dXLDbqZClSpk3gkjyw04o4x5Wc77ykoksUujGnikAPa01OWOfbrRFLr5WMXXnohY9mGRLCY0RAmAeLMoFyJK4MUprDig8oIowyLIxgglpPLobvqX2vZEM-k3PYtjYiQZRPQAUcPnPL-uPmYe2YFQd82hFk4pqU8onKKmwLLi1dzbncgliHvk2O4Sq8"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-tight font-extrabold">APEX</span><div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full border border-primary/20 shadow-[0_0_8px_rgba(56,189,248,0.15)]"><span class="material-symbols-outlined text-[12px] text-primary">bolt</span><span class="font-label-caps text-label-caps uppercase text-primary font-bold">LVL 42</span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">7D 🔥</span></div></div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">High Performance Lab</span></div></div><div class="flex items-center gap-space-sm"><div class="hidden items-center gap-1 bg-surface-container-high px-space-xs py-0.5 rounded-full text-error" id="offline-indicator"><span class="material-symbols-outlined text-[14px]">cloud_off</span><span class="font-label-caps text-label-caps">OFFLINE</span></div><button aria-label="Instalar App" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest transition-all duration-200 active:scale-95 shadow-[0_0_12px_rgba(56,189,248,0.15)]" id="pwa-install-btn"><span class="material-symbols-outlined text-[20px]">install_mobile</span></button><div class="relative flex items-center cursor-pointer"><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/40 shadow-[0_0_10px_rgba(56,189,248,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIvAGvCeb0z055152F4yt5Iv2qW0xa8FYwAIixFfwUfunD9HlgoOVFIgW80x2fhEd20Lb84QzJrEaxZPPLtnkK2p3v3BZGI4c8KYrTv62iDOCrRwh4xoC8fYCQ9d_iqs6dr4H6DKR3xLvaCoMDmP0N5_rb6oGP2jfJAVxjWPN8_DZuaOPVzYliYuXzf8kBF8HNOkjqb-O-Ml18RwacnlJiFGFJ5jb1NlB6PNvdtSQ"/><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-surface shadow-[0_0_6px_#38bdf8]"></span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full relative">
+<!-- Status do Assistente & Telemetria HUD -->
+<div class="sticky top-0 z-30 bg-surface-container-lowest/90 backdrop-blur-xl px-margin py-space-sm shadow-xl flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-surface-container-high shadow-[0_0_16px_rgba(56,189,248,0.25)]">
+<span class="material-symbols-outlined text-primary text-[22px]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full animate-ping"></span>
+<span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-container rounded-full"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h1 class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight">Apex Gemini 1.5 Pro</h1>
+<span class="px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-secondary-fixed font-label-caps text-label-caps uppercase">Neural v3</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+<span class="font-label-caps text-label-caps text-primary font-bold tracking-wide">ONLINE • VINCULADO AO TREINO ATIVO</span>
+</div>
+</div>
+</div>
+<button aria-label="Ajustar Modelo" class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors" id="coach-settings-btn">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<!-- Live Telemetry Stream Chip -->
+<div class="flex items-center justify-between bg-surface-container-low px-space-sm py-1.5 rounded-lg shadow-sm">
+<div class="flex items-center gap-space-xs overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0 animate-pulse">sensors</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant truncate">
+          Lendo sessão ativa: <strong class="text-on-surface">Supino Reto 84kg × 8 reps</strong> | RPE 8.5
+        </span>
+</div>
+<span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0 font-bold">140 BPM</span>
+</div>
+<!-- Mode Selector Segmented Control -->
+<div class="flex items-center p-1 bg-surface-container-high rounded-xl gap-1" id="mode-selector">
+<button class="flex-1 py-1.5 rounded-lg text-center font-label-caps text-label-caps uppercase transition-all duration-200 bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(56,189,248,0.3)]" data-mode="biomechanic">
+        Técnico / Biomecânico
+      </button>
+<button class="flex-1 py-1.5 rounded-lg text-center font-label-caps text-label-caps uppercase transition-all duration-200 text-on-surface-variant hover:text-on-surface font-semibold" data-mode="quick">
+        Rápido / Academia
+      </button>
+<button class="flex-1 py-1.5 rounded-lg text-center font-label-caps text-label-caps uppercase transition-all duration-200 text-on-surface-variant hover:text-on-surface font-semibold" data-mode="nutrition">
+        Nutrição &amp; Deload
+      </button>
+</div>
+</div>
+<!-- Quick Action Pills (Horizontal Scroll) -->
+<div class="py-space-sm px-margin flex gap-space-xs overflow-x-auto no-scrollbar scroll-smooth">
+<button class="quick-pill shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface text-body-sm font-body-sm shadow-sm" data-prompt="Por que meu ombro estalou no supino?">
+<span class="text-[14px]">💡</span>
+<span class="truncate">Ombro estalou no supino?</span>
+</button>
+<button class="quick-pill shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface text-body-sm font-body-sm shadow-sm" data-prompt="Devo aumentar 2kg ou fazer mais 2 reps com a mesma carga?">
+<span class="text-[14px]">⚖️</span>
+<span class="truncate">+2kg ou +2 reps?</span>
+</button>
+<button class="quick-pill shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface text-body-sm font-body-sm shadow-sm" data-prompt="Preciso de substituição para Agachamento Livre devido a desconforto lombar.">
+<span class="text-[14px]">🔄</span>
+<span class="truncate">Trocar Agachamento Livre</span>
+</button>
+<button class="quick-pill shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface text-body-sm font-body-sm shadow-sm" data-prompt="O que consumir 45 minutos antes de um treino pesado de pernas?">
+<span class="text-[14px]">🥪</span>
+<span class="truncate">Pré-treino pernas (45m)</span>
+</button>
+<button class="quick-pill shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface text-body-sm font-body-sm shadow-sm" data-prompt="Quando devo aplicar uma semana de deload no meu ciclo?">
+<span class="text-[14px]">🔋</span>
+<span class="truncate">Momento do Deload</span>
+</button>
+</div>
+<!-- Feed de Conversação do Chat -->
+<div class="flex flex-col px-margin gap-space-md pb-32 pt-2" id="chat-messages">
+<!-- Boas-vindas do Gemini -->
+<div class="flex items-start gap-space-sm max-w-[92%]">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-secondary-container to-primary flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(56,189,248,0.4)]">
+<span class="material-symbols-outlined text-surface text-[18px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-body-sm text-primary font-bold">Apex Gemini Coach</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Agora</span>
+</div>
+<div class="bg-surface-container-high text-on-surface p-space-md rounded-2xl rounded-tl-sm shadow-md flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md leading-relaxed">
+            Salve, atleta! Sou o seu <strong>Apex Gemini Coach 1.5</strong>. Estou conectado aos seus sensores e histórico de repetições em tempo real.
+          </p>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Acompanho seu volume semanal, RPE acumulado e velocidade da barra. Qual a dúvida ou ajuste biomecânico para a sessão de hoje?
+          </p>
+<div class="flex items-center gap-2 pt-1">
+<span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+<span class="font-label-caps text-label-caps text-primary tracking-wide">TELEMETRIA ATIVA: BANCO SUPINO #1</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mensagem Pré-Renderizada de Exemplo: Usuário -->
+<div class="flex items-start justify-end gap-space-sm self-end max-w-[88%]">
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">15:42</span>
+<span class="font-headline-sm text-body-sm text-on-surface font-semibold">Você</span>
+</div>
+<div class="bg-secondary-container text-on-secondary-container p-space-md rounded-2xl rounded-tr-sm shadow-md">
+<p class="font-body-md text-body-md">
+            Senti que na 3ª série de Supino a velocidade da barra caiu muito nas últimas 2 reps. Devo manter os 84kg na 4ª série?
+          </p>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface text-[18px]">person</span>
+</div>
+</div>
+<!-- Resposta Pré-Renderizada: Apex Gemini com Ação Biomecânica -->
+<div class="flex items-start gap-space-sm max-w-[95%]">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-secondary-container to-primary flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(56,189,248,0.4)]">
+<span class="material-symbols-outlined text-surface text-[18px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex flex-col gap-1.5 w-full">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-body-sm text-primary font-bold">Apex Gemini Coach</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">15:42</span>
+</div>
+<div class="bg-surface-container-high text-on-surface p-space-md rounded-2xl rounded-tl-sm shadow-lg flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">speed</span>
+<span class="font-headline-sm text-body-md text-primary font-bold">Diagnóstico VBT (Velocity Based Training)</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Detectei uma queda de <strong class="text-on-surface">~28% na velocidade concêntrica média</strong> entre a rep 6 e 8 na série 3. Seu RPE real saltou de 7.5 para <strong class="text-on-surface">9.2</strong>.
+          </p>
+<!-- Telemetria Card -->
+<div class="grid grid-cols-2 gap-space-xs bg-surface-container-low p-space-sm rounded-xl">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Perda de Velocidade</span>
+<span class="font-metric-md text-metric-md text-error font-extrabold">-28% (Fadiga)</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant">RIR Projetado (Série 4)</span>
+<span class="font-metric-md text-metric-md text-primary font-extrabold">0 ou Falha</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+<strong>Recomendação:</strong> Aplique uma redução autorregulada de <strong>4% da carga (-4kg = 80kg totais)</strong>. Isso preservará seu recrutamento de unidades motoras sem fritar o SNC antes do Supino Inclinado com Halteres.
+          </p>
+<!-- Interactive Action Card -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl flex items-center justify-between gap-space-sm mt-1 shadow-inner">
+<div class="flex items-center gap-space-xs min-w-0">
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[18px]">fitness_center</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-body-sm text-on-surface font-bold truncate">Série 4: Ajustar para 80kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Metas: 8 reps @ RPE 8.0</span>
+</div>
+</div>
+<button class="shrink-0 px-3 py-2 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps uppercase font-bold tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-[0_0_12px_rgba(56,189,248,0.35)]" id="apply-weight-btn">
+              Aplicar 80kg
+            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Indicador de Digitação / Streaming (Invisível por padrão) -->
+<div class="hidden items-center gap-space-sm max-w-[80%]" id="ai-typing-indicator">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-secondary-container to-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-surface text-[18px]">auto_awesome</span>
+</div>
+<div class="bg-surface-container-high px-space-md py-3 rounded-2xl rounded-tl-sm flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+<div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></div>
+<div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant ml-2 uppercase">Gemini Pensando...</span>
+</div>
+</div>
+</div>
+<!-- Floating Fixed Input Bar na Action Zone -->
+<div class="fixed bottom-16 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-2xl p-space-sm shadow-[0_-8px_24px_rgba(0,0,0,0.6)]">
+<div class="flex items-center gap-space-xs max-w-lg mx-auto w-full">
+<!-- Botão de Microfone / Áudio em Treino -->
+<button aria-label="Falar dúvida no microfone" class="w-11 h-11 shrink-0 rounded-xl bg-surface-container-high text-primary flex items-center justify-center hover:bg-surface-container-highest active:scale-95 transition-all relative" id="voice-input-btn">
+<span class="material-symbols-outlined text-[20px]" id="mic-icon">mic</span>
+<span class="hidden absolute inset-0 rounded-xl bg-primary/20 animate-ping" id="mic-wave"></span>
+</button>
+<!-- Input de Texto -->
+<div class="relative flex-1 flex items-center">
+<input class="w-full bg-surface-container-high text-on-surface placeholder-on-surface-variant px-space-md py-3 rounded-xl font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner pr-10" id="chat-input" placeholder="Pergunte ao Gemini Coach (ex: biomecânica, RPE)..." type="text"/>
+<button aria-label="Limpar texto" class="hidden absolute right-3 text-on-surface-variant hover:text-on-surface" id="clear-input-btn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Botão de Envio com Efeito Neon -->
+<button aria-label="Enviar mensagem" class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-tr from-secondary-container to-primary-container text-surface flex items-center justify-center active:scale-95 transition-all shadow-[0_0_16px_rgba(56,189,248,0.4)] disabled:opacity-50" id="send-chat-btn">
+<span class="material-symbols-outlined text-[20px] font-bold">send</span>
+</button>
+</div>
+<!-- Indicador de Status Discreto da Voz -->
+<div class="hidden text-center mt-1" id="voice-status">
+<span class="font-label-caps text-label-caps text-primary animate-pulse font-bold tracking-wider">ESCUTANDO... FALE SUA DÚVIDA</span>
+</div>
+</div>
+</div>
+<script>
+  (function initGeminiCoach() {
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-chat-btn');
+    const messagesContainer = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('ai-typing-indicator');
+    const voiceBtn = document.getElementById('voice-input-btn');
+    const micIcon = document.getElementById('mic-icon');
+    const micWave = document.getElementById('mic-wave');
+    const voiceStatus = document.getElementById('voice-status');
+    const clearInputBtn = document.getElementById('clear-input-btn');
+    const quickPills = document.querySelectorAll('.quick-pill');
+    const modeButtons = document.querySelectorAll('#mode-selector button');
+    const applyWeightBtn = document.getElementById('apply-weight-btn');
+
+    let currentMode = 'biomechanic';
+    let isRecording = false;
+
+    // Respostas simuladas inteligentes de acordo com palavras-chave e modo
+    const knowledgeBase = [
+      {
+        triggers: ['ombro', 'estalo', 'dor no ombro', 'estalo no supino'],
+        response: `**Avaliação Biomecânica de Estalo no Ombro:**
+Um estalo súbito indolor geralmente decorre de subluxação transitória do tendão do bíceps no sulco intertubercular ou cavitação glenoumeral. 
+Se houver dor em pontada ou perda de estabilidade:
+1. Reduza imediatamente a amplitude nos últimos 3cm do peitoral (evite hiperabdução horizontal).
+2. Retraia e deprima ativamente as escápulas ("empurre os ombros para os bolsos de trás").
+3. Mude a pegada para 1.5x a largura biacromial ou substitua pelo Supino com Halteres em pegada neutra/semipronada.`
+      },
+      {
+        triggers: ['aumentar', '2kg', 'reps', '+2kg', 'sobrecarga'],
+        response: `**Princípio da Sobrecarga Progressiva Apex:**
+Se na última série você atingiu o topo da faixa de repetições estipulada com **RPE menor ou igual a 8 (2+ RIR)**:
+- **Exercícios Compostos:** Aumente 2kg no peso total se seu objetivo for força e tensão mecânica.
+- **Isoladores:** Prefira acumular 1 a 2 repetições adicionais com a carga atual antes de subir peso, garantindo controle excêntrico de 3 segundos.`
+      },
+      {
+        triggers: ['agachamento', 'lombar', 'costas', 'trocar', 'substituir'],
+        response: `**Substituição para Poupar Coluna Lombar:**
+Para manter estímulo intenso no quadríceps sem sobrecarga axial compressiva:
+1. **Agachamento Búlgaro (Rear Foot Elevated Split Squat):** 80% menos carga sobre as vértebras lombares L4-L5 e hipertrofia equivalente.
+2. **Leg Press 45° com apoio de quadril colado:** Zero cisalhamento anterior da coluna lombar.
+3. **Agachamento Hack:** Apoio torácico fixo com vetor direcionado exclusivamente aos joelhos.`
+      },
+      {
+        triggers: ['comer', 'pre-treino', '45min', 'pernas', 'dieta', 'nutricao'],
+        response: `**Janela Pré-Treino de Pernas (T-45 min):**
+Para evitar sequestro de fluxo sanguíneo mesentérico e garantir glicemia rápida:
+- **Carboidrato de rápida assimilação:** 40g (ex: banana madura amassada com 2 colheres de mel ou 30g de maltodextrina/farinha de arroz).
+- **Proteína:** 15g a 20g de Whey Isolado ou Hidrolisado (baixo esvaziamento gástrico).
+- **Gorduras e Fibras:** ZERO. Evite pasta de amendoim ou aveia pesada agora para não gerar náusea nos agachamentos.`
+      },
+      {
+        triggers: ['deload', 'semana', 'cansaco', 'fadiga', 'descanso'],
+        response: `**Critérios de Acionamento do Deload:**
+Recomendo Deload quando você preencher 2 dos 3 critérios da telemetria:
+1. **Perda de rendimento:** Falha em atingir as repetições mínimas por 2 sessões seguidas no mesmo grupo muscular.
+2. **Qualidade do sono & RPE:** RPE percebido subindo >1 ponto em cargas submáximas.
+3. **Volume Acumulado:** Passou de 5 a 6 semanas de mesociclo hipertrófico progressivo.
+*Protocolo de Deload Apex:* Mantenha as cargas, mas reduza o volume de séries em 50% durante 7 dias.`
+      }
+    ];
+
+    // Alternar Modos
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modeButtons.forEach(b => {
+          b.className = 'flex-1 py-1.5 rounded-lg text-center font-label-caps text-label-caps uppercase transition-all duration-200 text-on-surface-variant hover:text-on-surface font-semibold';
+        });
+        btn.className = 'flex-1 py-1.5 rounded-lg text-center font-label-caps text-label-caps uppercase transition-all duration-200 bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(56,189,248,0.3)]';
+        currentMode = btn.getAttribute('data-mode');
+      });
+    });
+
+    // Quick Pills
+    quickPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const text = pill.getAttribute('data-prompt');
+        chatInput.value = text;
+        submitMessage(text);
+      });
+    });
+
+    // Input Events
+    chatInput.addEventListener('input', () => {
+      clearInputBtn.classList.toggle('hidden', chatInput.value.length === 0);
+    });
+
+    clearInputBtn.addEventListener('click', () => {
+      chatInput.value = '';
+      clearInputBtn.classList.add('hidden');
+      chatInput.focus();
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = chatInput.value.trim();
+        if (text) submitMessage(text);
+      }
+    });
+
+    sendBtn.addEventListener('click', () => {
+      const text = chatInput.value.trim();
+      if (text) submitMessage(text);
+    });
+
+    // Voice Simulation
+    voiceBtn.addEventListener('click', () => {
+      isRecording = !isRecording;
+      if (isRecording) {
+        voiceBtn.classList.add('bg-error', 'text-on-error');
+        micIcon.textContent = 'mic_off';
+        micWave.classList.remove('hidden');
+        voiceStatus.classList.remove('hidden');
+        chatInput.placeholder = "Ouvindo sua voz com cancelamento de ruído...";
+        
+        // Simular final de transcrição após 3 segundos
+        setTimeout(() => {
+          if (isRecording) {
+            isRecording = false;
+            voiceBtn.classList.remove('bg-error', 'text-on-error');
+            micIcon.textContent = 'mic';
+            micWave.classList.add('hidden');
+            voiceStatus.classList.add('hidden');
+            chatInput.placeholder = "Pergunte ao Gemini Coach (ex: biomecânica, RPE)...";
+            chatInput.value = "Minha lombar está fadigada após a terceira série de agachamento.";
+            submitMessage(chatInput.value);
+          }
+        }, 2800);
+      } else {
+        voiceBtn.classList.remove('bg-error', 'text-on-error');
+        micIcon.textContent = 'mic';
+        micWave.classList.add('hidden');
+        voiceStatus.classList.add('hidden');
+        chatInput.placeholder = "Pergunte ao Gemini Coach (ex: biomecânica, RPE)...";
+      }
+    });
+
+    // Enviar Mensagem do Usuário e Gerar Resposta Gemini
+    function submitMessage(text) {
+      chatInput.value = '';
+      clearInputBtn.classList.add('hidden');
+
+      // 1. Inserir bolha do Usuário
+      const userBubble = document.createElement('div');
+      userBubble.className = 'flex items-start justify-end gap-space-sm self-end max-w-[88%] animate-fade-in';
+      userBubble.innerHTML = `
+        <div class="flex flex-col items-end gap-1">
+          <div class="flex items-center gap-2">
+            <span class="font-label-caps text-label-caps text-on-surface-variant">Agora</span>
+            <span class="font-headline-sm text-body-sm text-on-surface font-semibold">Você</span>
+          </div>
+          <div class="bg-secondary-container text-on-secondary-container p-space-md rounded-2xl rounded-tr-sm shadow-md">
+            <p class="font-body-md text-body-md">${escapeHtml(text)}</p>
+          </div>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-surface text-[18px]">person</span>
+        </div>
+      `;
+      messagesContainer.appendChild(userBubble);
+      scrollToBottom();
+
+      // 2. Mostrar indicador de pensamento Gemini
+      typingIndicator.classList.remove('hidden');
+      typingIndicator.classList.add('flex');
+      messagesContainer.appendChild(typingIndicator);
+      scrollToBottom();
+
+      // 3. Processar resposta
+      setTimeout(() => {
+        typingIndicator.classList.add('hidden');
+        typingIndicator.classList.remove('flex');
+        generateAIResponse(text);
+      }, 1100);
+    }
+
+    function generateAIResponse(userText) {
+      const lower = userText.toLowerCase();
+      let matched = knowledgeBase.find(k => k.triggers.some(t => lower.includes(t)));
+
+      let contentHtml = '';
+      if (matched) {
+        contentHtml = formatMarkdown(matched.response);
+      } else {
+        // Resposta genérica contextual com modo
+        if (currentMode === 'quick') {
+          contentHtml = `<p class="font-body-md text-body-md"><strong>Orientação Direta:</strong> Mantenha a cadência de 2 segundos na descida, concentre a força no ponto de contração e finalize a série com 1 repetição de reserva (RIR 1). Hidrate-se agora com 200ml de água.</p>`;
+        } else if (currentMode === 'nutrition') {
+          contentHtml = `<p class="font-body-md text-body-md"><strong>Análise Nutricional:</strong> Para acelerar a ressíntese de fosfocreatina e diminuir danos musculares da sessão atual, garanta ingestão pós-treino com 0.4g de proteína de alto valor biológico por kg corporal combinada com carboidratos de índice glicêmico moderado.</p>`;
+        } else {
+          contentHtml = `<p class="font-body-md text-body-md">Com base no seu modelo biomecânico e nos 84kg registrados na série anterior, sua relação trabalho/descanso está em 1:2.5. Para otimizar o recrutamento fibrilar sem dissipar torque articular, certifique-se de que o trajeto do movimento preserva a linha de ação da gravidade sobre o músculo-alvo.</p>`;
+        }
+      }
+
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'flex items-start gap-space-sm max-w-[95%] animate-fade-in';
+      aiBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-secondary-container to-primary flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(56,189,248,0.4)]">
+          <span class="material-symbols-outlined text-surface text-[18px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+        </div>
+        <div class="flex flex-col gap-1.5 w-full">
+          <div class="flex items-center gap-2">
+            <span class="font-headline-sm text-body-sm text-primary font-bold">Apex Gemini Coach</span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant">Agora</span>
+          </div>
+          <div class="bg-surface-container-high text-on-surface p-space-md rounded-2xl rounded-tl-sm shadow-lg flex flex-col gap-space-sm">
+            ${contentHtml}
+            <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20 mt-1">
+              <span class="font-label-caps text-label-caps text-on-surface-variant">Modo: ${currentMode.toUpperCase()}</span>
+              <div class="flex items-center gap-2">
+                <button class="text-on-surface-variant hover:text-primary transition-colors text-body-sm" title="Útil"><span class="material-symbols-outlined text-[16px]">thumb_up</span></button>
+                <button class="text-on-surface-variant hover:text-error transition-colors text-body-sm" title="Não ajudou"><span class="material-symbols-outlined text-[16px]">thumb_down</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      messagesContainer.appendChild(aiBubble);
+      scrollToBottom();
+    }
+
+    // Botão de aplicar carga
+    if (applyWeightBtn) {
+      applyWeightBtn.addEventListener('click', () => {
+        applyWeightBtn.textContent = '80kg Aplicado!';
+        applyWeightBtn.classList.remove('bg-primary', 'text-on-primary');
+        applyWeightBtn.classList.add('bg-secondary-container', 'text-on-secondary-container');
+        
+        // Disparar feedback de toast haptic
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-space-md py-2 rounded-full font-label-caps text-label-caps font-bold shadow-[0_0_16px_rgba(56,189,248,0.5)] z-50 flex items-center gap-1.5';
+        toast.innerHTML = '<span class="material-symbols-outlined text-[16px]">check_circle</span> SÉRIE 4 ATUALIZADA NO LOG (80KG)';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      });
+    }
+
+    function scrollToBottom() {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m]);
+    }
+
+    function formatMarkdown(text) {
+      let formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-on-surface">$1</strong>')
+        .replace(/\n/g, '<br/>');
+      return `<div class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${formatted}</div>`;
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.5)] border-t border-white/[0.04]" data-active-classes="text-primary [filter:drop-shadow(0_0_8px_rgba(56,189,248,0.6))] font-bold"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="treinos-fichas" href="#"><span class="material-symbols-outlined text-[24px]">fitness_center</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Treinos</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all relative" data-path="treino-ativo" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[24px]">timer</span><span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-ping"></span></div><span class="font-label-caps text-label-caps uppercase tracking-wider">Ativo</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="ia-coach-gemini-assistant" href="#"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-caps text-label-caps uppercase tracking-wider">IA Coach</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="nutricao-macros" href="#"><span class="material-symbols-outlined text-[24px]">nutrition</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Nutrição</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="dashboard-tonelagem" href="#"><span class="material-symbols-outlined text-[24px]">military_tech</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Progresso</span></a></div></nav></body></html>

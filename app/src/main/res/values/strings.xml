@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Apex Performance</string>
+    <string name="brand_apex">APEX</string>
+    <string name="nav_treinos">Treinos</string>
+    <string name="nav_ativo">Ativo</string>
+    <string name="nav_ia_coach">IA Coach</string>
+    <string name="nav_nutricao">Nutrição</string>
+    <string name="nav_progresso">Progresso</string>
+    <string name="cd_apex_logo">Apex Performance Logo</string>
+    <string name="cd_profile_avatar">Perfil do Atleta</string>
+    <string name="cd_install_app">Instalar App</string>
+    <string name="cd_close">Fechar</string>
+    <string name="cd_voice_input">Falar dúvida no microfone</string>
+    <string name="cd_send_message">Enviar mensagem</string>
+    <string name="cd_toggle_sound">Alternar som do cronômetro</string>
+    <string name="cd_decrease_weight">Diminuir peso</string>
+    <string name="cd_increase_weight">Aumentar peso</string>
+    <string name="cd_decrease_reps">Diminuir repetições</string>
+    <string name="cd_increase_reps">Aumentar repetições</string>
+    <string name="cd_complete_set">Concluir série</string>
+</resources>

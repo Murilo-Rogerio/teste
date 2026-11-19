@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#131b2e", "on-error-container": "#ffdad6", "on-tertiary-fixed": "#001c39", "on-surface-variant": "#bdc8d1", "outline-variant": "#3e484f", "error-container": "#93000a", "secondary-fixed": "#dbe1ff", "surface-container-highest": "#2d3449", "primary-fixed": "#c4e7ff", "on-background": "#dae2fd", "on-primary-container": "#004965", "surface-tint": "#7bd0ff", "surface-dim": "#0b1326", "inverse-surface": "#dae2fd", "surface": "#0b1326", "on-primary-fixed-variant": "#004c69", "primary": "#8ed5ff", "secondary-container": "#0053db", "secondary-fixed-dim": "#b4c5ff", "tertiary-container": "#7bb4ff", "on-primary": "#00354a", "on-secondary": "#002a78", "on-error": "#690005", "surface-variant": "#2d3449", "surface-bright": "#31394d", "on-secondary-container": "#cdd7ff", "on-tertiary-container": "#00457e", "tertiary-fixed-dim": "#a4c9ff", "on-surface": "#dae2fd", "error": "#ffb4ab", "inverse-on-surface": "#283044", "on-secondary-fixed-variant": "#003ea8", "on-tertiary-fixed-variant": "#004883", "surface-container-high": "#222a3d", "primary-container": "#38bdf8", "on-secondary-fixed": "#00174b", "background": "#0b1326", "surface-container-lowest": "#060e20", "secondary": "#b4c5ff", "primary-fixed-dim": "#7bd0ff", "tertiary": "#afcfff", "tertiary-fixed": "#d4e3ff", "inverse-primary": "#00668a", "outline": "#87929a", "surface-container": "#171f33", "on-tertiary": "#00315d", "on-primary-fixed": "#001e2c" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2.25rem", "gutter-desktop": "1.5rem", "margin-desktop": "2.5rem", "space-lg": "1.5rem", "margin": "1rem", "gutter": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-interactive": ["Plus Jakarta Sans"], "label-caps": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "metric-huge": ["Plus Jakarta Sans"], "metric-lg": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "body-md": ["Inter"], "metric-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "label-interactive": ["14px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600"}], "label-caps": ["11px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700"}], "display-hero": ["56px", {"lineHeight": "60px", "letterSpacing": "-0.03em", "fontWeight": "800"}], "display-hero-mobile": ["40px", {"lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "800"}], "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400"}], "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "metric-huge": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "800"}], "metric-lg": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}], "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}], "metric-md": ["20px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}], "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700"}], "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}] } } } }</script><style>body { min-height: max(884px, 100dvh); }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.4)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><img alt="Apex Performance Logo" class="h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(56,189,248,0.45)]" src="https://lh3.googleusercontent.com/aida/ALJJyrDiljOa52qcWyUank09X9IBfROuBWTTUvRDa3nW1bTpE3_y8dXLDbqZClSpk3gkjyw04o4x5Wc77ykoksUujGnikAPa01OWOfbrRFLr5WMXXnohY9mGRLCY0RAmAeLMoFyJK4MUprDig8oIowyLIxgglpPLobvqX2vZEM-k3PYtjYiQZRPQAUcPnPL-uPmYe2YFQd82hFk4pqU8onKKmwLLi1dzbncgliHvk2O4Sq8"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-tight font-extrabold">APEX</span><div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full border border-primary/20 shadow-[0_0_8px_rgba(56,189,248,0.15)]"><span class="material-symbols-outlined text-[12px] text-primary">bolt</span><span class="font-label-caps text-label-caps uppercase text-primary font-bold">LVL 42</span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">7D 🔥</span></div></div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">High Performance Lab</span></div></div><div class="flex items-center gap-space-sm"><div class="hidden items-center gap-1 bg-surface-container-high px-space-xs py-0.5 rounded-full text-error" id="offline-indicator"><span class="material-symbols-outlined text-[14px]">cloud_off</span><span class="font-label-caps text-label-caps">OFFLINE</span></div><button aria-label="Instalar App" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest transition-all duration-200 active:scale-95 shadow-[0_0_12px_rgba(56,189,248,0.15)]" id="pwa-install-btn"><span class="material-symbols-outlined text-[20px]">install_mobile</span></button><div class="relative flex items-center cursor-pointer"><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/40 shadow-[0_0_10px_rgba(56,189,248,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIvAGvCeb0z055152F4yt5Iv2qW0xa8FYwAIixFfwUfunD9HlgoOVFIgW80x2fhEd20Lb84QzJrEaxZPPLtnkK2p3v3BZGI4c8KYrTv62iDOCrRwh4xoC8fYCQ9d_iqs6dr4H6DKR3xLvaCoMDmP0N5_rb6oGP2jfJAVxjWPN8_DZuaOPVzYliYuXzf8kBF8HNOkjqb-O-Ml18RwacnlJiFGFJ5jb1NlB6PNvdtSQ"/><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-surface shadow-[0_0_6px_#38bdf8]"></span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin pb-space-xl gap-space-lg text-on-surface">
+<!-- Executive Performance Banner -->
+<section class="flex flex-col gap-space-md pt-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps uppercase text-primary tracking-widest flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_8px_#38bdf8]"></span>
+          Telemetria de Carga &amp; Volume
+        </span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">Progresso &amp; Tonelagem</h2>
+</div>
+<!-- Quick Action: Export Logs -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-high text-primary hover:bg-surface-container-highest transition-all duration-200 active:scale-95 shadow-md" id="export-trigger-btn">
+<span class="material-symbols-outlined text-[18px]">download_for_offline</span>
+<span class="font-label-caps text-label-caps uppercase">Exportar</span>
+</button>
+</div>
+<!-- Executive Metric Bento Grid -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Metric: Tonelagem Total -->
+<div class="col-span-2 relative overflow-hidden rounded-xl bg-surface-container p-space-md shadow-xl">
+<div class="absolute -right-10 -bottom-10 w-36 h-36 rounded-full bg-primary-container/10 blur-2xl pointer-events-none"></div>
+<div class="flex justify-between items-start mb-space-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Volume Semanal Bruto</span>
+<div class="flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded-full text-[#4ade80] shadow-sm">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-label-caps text-label-caps font-bold">+12%</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-metric-huge text-metric-huge text-on-surface tracking-tight">48.650</span>
+<span class="font-headline-sm text-headline-sm text-primary uppercase font-bold">KG</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          +5.210 kg superados em relação ao microciclo S5.
+        </p>
+<!-- Dynamic Micro Volume Sparks -->
+<div class="mt- space-sm pt-space-xs flex items-center justify-between gap-1 h-6">
+<div class="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="h-full bg-gradient-to-r from-secondary-container via-primary-container to-primary rounded-full transition-all duration-700 shadow-[0_0_12px_rgba(56,189,248,0.5)]" style="width: 82%;"></div>
+</div>
+<span class="font-label-caps text-label-caps text-primary font-bold whitespace-nowrap">82% DA META</span>
+</div>
+</div>
+<!-- Metric: Treinos & Frequência -->
+<div class="flex flex-col justify-between rounded-xl bg-surface-container p-space-md shadow-md">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase">Assiduidade</span>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+<div class="my-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-metric-lg text-metric-lg text-on-surface">5</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">/ 5</span>
+</div>
+<span class="font-body-sm text-body-sm text-[#4ade80] font-semibold">100% Executado</span>
+</div>
+<div class="flex gap-1">
+<span class="h-1.5 flex-1 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+<span class="h-1.5 flex-1 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+<span class="h-1.5 flex-1 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+<span class="h-1.5 flex-1 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+<span class="h-1.5 flex-1 rounded-full bg-primary-container shadow-[0_0_6px_#38bdf8]"></span>
+</div>
+</div>
+<!-- Metric: TUT (Time Under Tension) -->
+<div class="flex flex-col justify-between rounded-xl bg-surface-container p-space-md shadow-md">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-caps text-label-caps uppercase">Sob Tensão</span>
+<span class="material-symbols-outlined text-primary text-[18px]">timelapse</span>
+</div>
+<div class="my-space-xs">
+<div class="flex items-baseline gap-1">
+<span class="font-metric-lg text-metric-lg text-on-surface">4h 38m</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Média 55m / sessão</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="font-label-caps text-label-caps text-primary">RPE 8.2</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-label-caps text-label-caps text-[#4ade80]">Hipertrofia</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Volume Chart Section -->
+<section class="flex flex-col gap-space-sm rounded-xl bg-surface-container p-space-md shadow-xl">
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Curva de Sobrecarga</h3>
+</div>
+<!-- Period Filter Pills -->
+<div class="flex bg-surface-container-highest p-0.5 rounded-full" id="period-selector">
+<button class="period-btn px-2.5 py-1 rounded-full font-label-caps text-label-caps text-on-surface bg-primary text-on-primary font-bold shadow-sm transition-all" data-period="semanal">Semanal</button>
+<button class="period-btn px-2.5 py-1 rounded-full font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-all" data-period="mensal">Mensal</button>
+<button class="period-btn px-2.5 py-1 rounded-full font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-all" data-period="anual">Anual</button>
+</div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-body-sm text-body-sm" id="chart-sub-label">Volume total acumulado (6 últimas semanas)</span>
+<span class="font-label-caps text-label-caps text-primary-container font-semibold">Pico: S6 (48.6k)</span>
+</div>
+</div>
+<!-- Chart Canvas Area (SVG High-Precision Telemetry) -->
+<div class="relative w-full pt-4 pb-1">
+<svg class="w-full h-44 overflow-visible" viewbox="0 0 340 160">
+<defs>
+<lineargradient id="neonCyanGlow" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#38bdf8" stop-opacity="0.38"></stop>
+<stop offset="60%" stop-color="#2563eb" stop-opacity="0.10"></stop>
+<stop offset="100%" stop-color="#0b1326" stop-opacity="0"></stop>
+</lineargradient>
+<filter height="140%" id="neonBlur" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#38bdf8" flood-opacity="0.7" stddeviation="3.5"></fedropshadow>
+</filter>
+</defs>
+<!-- Horizontal Reference Gridlines -->
+<line opacity="0.6" stroke="#2d3449" stroke-dasharray="3,3" stroke-width="1" x1="0" x2="340" y1="20" y2="20"></line>
+<line opacity="0.6" stroke="#2d3449" stroke-dasharray="3,3" stroke-width="1" x1="0" x2="340" y1="65" y2="65"></line>
+<line opacity="0.6" stroke="#2d3449" stroke-dasharray="3,3" stroke-width="1" x1="0" x2="340" y1="110" y2="110"></line>
+<line opacity="0.8" stroke="#2d3449" stroke-width="1" x1="0" x2="340" y1="150" y2="150"></line>
+<!-- Reference values -->
+<text fill="#87929a" font-family="Inter" font-size="9" font-weight="600" text-anchor="end" x="338" y="18">50K</text>
+<text fill="#87929a" font-family="Inter" font-size="9" font-weight="600" text-anchor="end" x="338" y="63">40K</text>
+<text fill="#87929a" font-family="Inter" font-size="9" font-weight="600" text-anchor="end" x="338" y="108">30K</text>
+<!-- Deload Indicator Pill Area (S4) -->
+<rect fill="#131b2e" height="126" opacity="0.7" rx="6" width="46" x="156" y="24"></rect>
+<text fill="#87929a" font-family="Inter" font-size="8" font-weight="700" text-anchor="middle" x="179" y="38">DELOAD</text>
+<!-- Area Gradient Fill -->
+<path d="M 20,95 L 75,76 L 130,68 L 180,118 L 240,54 L 305,32 L 305,150 L 20,150 Z" fill="url(#neonCyanGlow)" id="chart-area"></path>
+<!-- Main Dynamic Stroke Line -->
+<path d="M 20,95 L 75,76 L 130,68 L 180,118 L 240,54 L 305,32" fill="none" filter="url(#neonBlur)" id="chart-line" stroke="#38bdf8" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<!-- Dynamic Data Node Anchors -->
+<!-- S1 -->
+<circle class="cursor-pointer hover:scale-125 transition-transform" cx="20" cy="95" data-val="38.000 kg" fill="#0b1326" r="4" stroke="#38bdf8" stroke-width="2.5"></circle>
+<!-- S2 -->
+<circle class="cursor-pointer hover:scale-125 transition-transform" cx="75" cy="76" data-val="41.000 kg" fill="#0b1326" r="4" stroke="#38bdf8" stroke-width="2.5"></circle>
+<!-- S3 -->
+<circle class="cursor-pointer hover:scale-125 transition-transform" cx="130" cy="68" data-val="42.500 kg" fill="#0b1326" r="4" stroke="#38bdf8" stroke-width="2.5"></circle>
+<!-- S4 (Deload) -->
+<circle class="cursor-pointer hover:scale-125 transition-transform" cx="180" cy="118" data-val="34.000 kg (Deload)" fill="#0b1326" r="4" stroke="#87929a" stroke-width="2.5"></circle>
+<!-- S5 -->
+<circle class="cursor-pointer hover:scale-125 transition-transform" cx="240" cy="54" data-val="45.000 kg" fill="#0b1326" r="4" stroke="#38bdf8" stroke-width="2.5"></circle>
+<!-- S6 (Record Peak) -->
+<circle class="cursor-pointer animate-pulse" cx="305" cy="32" data-val="48.650 kg" fill="#38bdf8" filter="url(#neonBlur)" r="5.5" stroke="#ffffff" stroke-width="2"></circle>
+<!-- Dynamic Tooltip Text in Canvas -->
+<text fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="10" font-weight="700" text-anchor="middle" x="305" y="18">48.65K</text>
+</svg>
+</div>
+<!-- Chart X-Axis Labels -->
+<div class="flex justify-between px-2 text-on-surface-variant font-label-caps text-label-caps">
+<span class="text-center w-8">S1</span>
+<span class="text-center w-8">S2</span>
+<span class="text-center w-8">S3</span>
+<span class="text-center w-8 text-on-surface font-semibold">S4</span>
+<span class="text-center w-8">S5</span>
+<span class="text-center w-8 text-primary font-bold">S6 (Hoje)</span>
+</div>
+<div class="flex items-center justify-center py-1.5 px-3 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-all duration-200" id="chart-tooltip-display">
+<span class="material-symbols-outlined text-primary text-[16px] mr-1.5">info</span>
+      Toque nos pontos da curva para inspecionar a tonelagem por microciclo.
+    </div>
+</section>
+<!-- PRs Históricos & 1RM Estimado Section -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">fitness_center</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recordes Pessoais (PRs)</h3>
+</div>
+<button class="flex items-center gap-1 bg-surface-container-high px-2.5 py-1.5 rounded-full text-primary hover:bg-surface-container-highest transition-all duration-200 active:scale-95 shadow-sm" id="open-calculator-modal-btn">
+<span class="material-symbols-outlined text-[16px]">calculate</span>
+<span class="font-label-caps text-label-caps uppercase">Calculadora 1RM</span>
+</button>
+</div>
+<!-- PR List Modular Cards -->
+<div class="flex flex-col gap-space-sm">
+<!-- PR 1: Supino Reto (Recent Record Batido) -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container p-space-md shadow-md flex flex-col gap-space-xs">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Supino Reto</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary font-label-caps text-label-caps font-bold shadow-[0_0_8px_rgba(56,189,248,0.3)]">
+                NOVO PR (+5kg) 🔥
+              </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Batido há 2 dias com RPE 9.0</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-primary">100 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Carga Real</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container-low px-3 py-2 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">speed</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1RM Estimado (Epley):</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold">118 kg</span>
+</div>
+</div>
+<!-- PR 2: Agachamento Livre -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md flex flex-col gap-space-xs">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Agachamento Livre</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Constância de profundidade paralela</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-on-surface">140 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Carga Real</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container-low px-3 py-2 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">speed</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1RM Estimado (Epley):</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold">162 kg</span>
+</div>
+</div>
+<!-- PR 3: Levantamento Terra -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md flex flex-col gap-space-xs">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Levantamento Terra</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Pegada mista, lockout rígido</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-on-surface">165 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Carga Real</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container-low px-3 py-2 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">speed</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1RM Estimado (Epley):</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold">185 kg</span>
+</div>
+</div>
+<!-- PR 4: Desenvolvimento Militar -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md flex flex-col gap-space-xs">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Desenvolvimento Militar (OHP)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Postura estrita sem impulso</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-on-surface">62 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Carga Real</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container-low px-3 py-2 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">speed</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1RM Estimado (Epley):</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold">72 kg</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Gamified Wall of Badges & Achievements -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">military_tech</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mural de Conquistas</h3>
+</div>
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">3 / 5 Desbloqueadas</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Achievement 1: Primeira Tonelada (Unlocked - Gold) -->
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-surface-container shadow-md">
+<div class="relative flex items-center justify-center w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-surface-container-highest shadow-[0_0_12px_rgba(250,204,21,0.3)]">
+<span class="material-symbols-outlined text-[28px] text-[#facc15]">workspace_premium</span>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#facc15] flex items-center justify-center text-surface text-[10px] font-bold">✓</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Primeira Tonelada</span>
+<span class="font-label-caps text-label-caps text-[#facc15] font-bold uppercase">Ouro</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+            Erga mais de 1.000 kg somados em uma única sessão de treino.
+          </p>
+</div>
+</div>
+<!-- Achievement 2: Clube dos 100kg no Supino (Unlocked - Platinum) -->
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-surface-container shadow-md">
+<div class="relative flex items-center justify-center w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-surface-container-highest shadow-[0_0_14px_rgba(56,189,248,0.5)]">
+<span class="material-symbols-outlined text-[28px] text-primary">diamond</span>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-on-primary text-[10px] font-bold">✓</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Clube dos 100kg Supino</span>
+<span class="font-label-caps text-label-caps text-primary font-bold uppercase">Platina</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+            Quebre a barreira de dois dígitos em série válida no Supino Reto.
+          </p>
+</div>
+</div>
+<!-- Achievement 3: Disciplina Espartana (Unlocked - Neon Cyan) -->
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-surface-container shadow-md">
+<div class="relative flex items-center justify-center w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-surface-container-highest shadow-[0_0_16px_rgba(56,189,248,0.6)]">
+<span class="material-symbols-outlined text-[28px] text-primary-container">local_fire_department</span>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-[10px] font-bold">✓</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Disciplina Espartana</span>
+<span class="font-label-caps text-label-caps text-primary-container font-bold uppercase">Diamante</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+            Mantenha 21 dias consecutivos de constância nutricional e registro.
+          </p>
+</div>
+</div>
+<!-- Achievement 4: Titã da Terra (In Progress 85%) -->
+<div class="flex flex-col gap-space-xs p-space-md rounded-xl bg-surface-container shadow-md">
+<div class="flex items-center gap-space-md">
+<div class="relative flex items-center justify-center w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-surface-container-highest opacity-90">
+<span class="material-symbols-outlined text-[26px] text-tertiary">hardware</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Titã da Terra</span>
+<span class="font-label-caps text-label-caps text-tertiary font-bold uppercase">85%</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+              Alcançar 180 kg no Levantamento Terra.
+            </p>
+</div>
+</div>
+<!-- Progress Bar Indicator -->
+<div class="mt-space-xs flex flex-col gap-1">
+<div class="flex justify-between items-center font-label-caps text-label-caps text-on-surface-variant">
+<span>Atual: 165 kg</span>
+<span class="text-primary font-semibold">Meta: 180 kg (-15kg)</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary rounded-full shadow-[0_0_8px_#8ed5ff]" style="width: 85%;"></div>
+</div>
+</div>
+</div>
+<!-- Achievement 5: Monstro dos 500kg (Locked) -->
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm opacity-60">
+<div class="flex items-center justify-center w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-surface-container-highest">
+<span class="material-symbols-outlined text-[24px] text-outline">lock</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Monstro dos 500kg</span>
+<span class="font-label-caps text-label-caps text-outline uppercase font-semibold">Bloqueado</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+            Total somado Supino + Agacho + Terra &gt; 500 kg (Progresso atual: 405 kg / 500 kg).
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Histórico & Logs Recentes de Sessão -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">history_edu</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Logs de Treinos Recentes</h3>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Microciclo 42</span>
+</div>
+<!-- Workout Logs Container -->
+<div class="flex flex-col gap-space-xs" id="workout-logs-list">
+<!-- Session Card 1 -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-md flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">sports_handball</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Push A — Peito &amp; Deltóides</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Hoje, 07:15 • 62 min • RPE 8.5</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-primary font-bold">11.420 kg</span>
+<span class="font-label-caps text-label-caps text-[#4ade80] font-semibold">22 Séries</span>
+</div>
+</div>
+<!-- Session Card 2 -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-md flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">directions_run</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Pull A — Dorsal &amp; Bíceps</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ontem, 18:30 • 58 min • RPE 8.0</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-on-surface font-bold">10.850 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">20 Séries</span>
+</div>
+</div>
+<!-- Session Card 3 -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-md flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">downhill_skiing</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Legs A — Quadríceps Foco</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Há 3 dias • 65 min • RPE 9.0</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-on-surface font-bold">14.120 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">24 Séries</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive 1RM Calculator Modal Drawer (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end justify-center hidden" id="calculator-modal">
+<div class="w-full max-w-lg rounded-t-3xl bg-surface-container p-space-lg flex flex-col gap-space-md shadow-2xl animate-in slide-in-from-bottom duration-300">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">calculate</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Calculadora 1RM Científica</h4>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface hover:text-primary transition-colors" id="close-calculator-btn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Estime sua repetição máxima com base em carga e repetições executadas sem ir até a falha total concêntrica.
+      </p>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Carga Levantada (kg)</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-highest text-on-surface font-headline-sm text-headline-sm focus:outline-none focus:ring-2 focus:ring-primary" id="calc-weight" max="600" min="1" type="number" value="100"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Reps Executadas</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-highest text-on-surface font-headline-sm text-headline-sm focus:outline-none focus:ring-2 focus:ring-primary" id="calc-reps" max="25" min="1" type="number" value="5"/>
+</div>
+</div>
+<!-- Result Comparison Outputs -->
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<div class="flex flex-col p-3 rounded-xl bg-surface-container-low">
+<span class="font-label-caps text-label-caps text-primary uppercase">Fórmula Epley</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold mt-1" id="result-epley">116.7 kg</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Ideal para 1-8 repetições</span>
+</div>
+<div class="flex flex-col p-3 rounded-xl bg-surface-container-low">
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Fórmula Brzycki</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold mt-1" id="result-brzycki">112.5 kg</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Conservador para força pura</span>
+</div>
+</div>
+<button class="w-full h-12 rounded-xl bg-gradient-to-r from-primary-container to-secondary-container text-surface font-headline-sm text-headline-sm font-bold shadow-[0_0_16px_rgba(56,189,248,0.4)] active:scale-98 transition-transform" id="apply-calc-btn">
+        Concluído
+      </button>
+</div>
+</div>
+<!-- Export Backup Drawer / Notification Modal -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end justify-center hidden" id="export-modal">
+<div class="w-full max-w-lg rounded-t-3xl bg-surface-container p-space-lg flex flex-col gap-space-md shadow-2xl">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">backup</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Exportar Telemetria Offline</h4>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface hover:text-primary transition-colors" id="close-export-btn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Gere uma cópia de segurança dos seus dados biométricos e tonelagem acumulada para uso local em planilhas ou importação.
+      </p>
+<div class="flex flex-col gap-space-sm pt-2">
+<button class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-highest hover:bg-surface-bright transition-all active:scale-98" id="export-json-action">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[24px]">data_object</span>
+<div class="flex flex-col text-left">
+<span class="font-headline-sm text-headline-sm text-on-surface">Exportar formato JSON</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Backup completo com timestamps brutos</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-highest hover:bg-surface-bright transition-all active:scale-98" id="export-csv-action">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container text-[24px]">table_chart</span>
+<div class="flex flex-col text-left">
+<span class="font-headline-sm text-headline-sm text-on-surface">Exportar formato CSV</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Compatível com Excel, Notion e Google Sheets</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+</button>
+</div>
+<div class="hidden items-center gap-2 p-3 rounded-xl bg-primary/10 text-primary text-center justify-center font-body-sm text-body-sm font-semibold" id="export-status-toast">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Download iniciado com sucesso! Arquivo gerado offline.</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initApexProgressTelemetry() {
+    // 1RM Calculation Logic
+    const weightInput = document.getElementById('calc-weight');
+    const repsInput = document.getElementById('calc-reps');
+    const resEpley = document.getElementById('result-epley');
+    const resBrzycki = document.getElementById('result-brzycki');
+
+    function calculate1RM() {
+      const w = parseFloat(weightInput.value) || 0;
+      const r = parseFloat(repsInput.value) || 1;
+
+      if (w <= 0 || r <= 0) return;
+
+      // Epley Formula: 1RM = W * (1 + r / 30)
+      const epley = w * (1 + (r / 30));
+      // Brzycki Formula: 1RM = W / (1.0278 - (0.0278 * r))
+      const brzycki = r < 37 ? (w / (1.0278 - (0.0278 * r))) : epley;
+
+      resEpley.textContent = `${epley.toFixed(1)} kg`;
+      resBrzycki.textContent = `${brzycki.toFixed(1)} kg`;
+    }
+
+    if (weightInput && repsInput) {
+      weightInput.addEventListener('input', calculate1RM);
+      repsInput.addEventListener('input', calculate1RM);
+    }
+
+    // Modal Control: 1RM Calculator
+    const openCalcBtn = document.getElementById('open-calculator-modal-btn');
+    const closeCalcBtn = document.getElementById('close-calculator-btn');
+    const applyCalcBtn = document.getElementById('apply-calc-btn');
+    const calcModal = document.getElementById('calculator-modal');
+
+    function toggleCalcModal(show) {
+      if (calcModal) {
+        if (show) {
+          calcModal.classList.remove('hidden');
+          calculate1RM();
+        } else {
+          calcModal.classList.add('hidden');
+        }
+      }
+    }
+
+    if (openCalcBtn) openCalcBtn.addEventListener('click', () => toggleCalcModal(true));
+    if (closeCalcBtn) closeCalcBtn.addEventListener('click', () => toggleCalcModal(false));
+    if (applyCalcBtn) applyCalcBtn.addEventListener('click', () => toggleCalcModal(false));
+
+    // Modal Control: Export Data
+    const exportTrigger = document.getElementById('export-trigger-btn');
+    const exportModal = document.getElementById('export-modal');
+    const closeExportBtn = document.getElementById('close-export-btn');
+    const exportJsonAction = document.getElementById('export-json-action');
+    const exportCsvAction = document.getElementById('export-csv-action');
+    const exportToast = document.getElementById('export-status-toast');
+
+    function toggleExportModal(show) {
+      if (exportModal) {
+        if (show) exportModal.classList.remove('hidden');
+        else {
+          exportModal.classList.add('hidden');
+          if (exportToast) exportToast.classList.add('hidden');
+        }
+      }
+    }
+
+    if (exportTrigger) exportTrigger.addEventListener('click', () => toggleExportModal(true));
+    if (closeExportBtn) closeExportBtn.addEventListener('click', () => toggleExportModal(false));
+
+    function triggerMockExport(type) {
+      if (exportToast) {
+        exportToast.classList.remove('hidden');
+        exportToast.classList.add('flex');
+        setTimeout(() => {
+          toggleExportModal(false);
+        }, 1800);
+      }
+    }
+
+    if (exportJsonAction) exportJsonAction.addEventListener('click', () => triggerMockExport('JSON'));
+    if (exportCsvAction) exportCsvAction.addEventListener('click', () => triggerMockExport('CSV'));
+
+    // Interactive Chart Telemetry Node Inspection
+    const nodes = document.querySelectorAll('svg circle[data-val]');
+    const tooltipDisplay = document.getElementById('chart-tooltip-display');
+
+    nodes.forEach(node => {
+      node.addEventListener('click', function() {
+        const val = this.getAttribute('data-val');
+        if (tooltipDisplay && val) {
+          tooltipDisplay.innerHTML = `<span class="material-symbols-outlined text-primary text-[16px] mr-1.5">query_stats</span> Tonelagem Registrada: <strong class="text-primary ml-1">${val}</strong>`;
+        }
+      });
+    });
+
+    // Chart Time Horizon Tabs (Semanal, Mensal, Anual)
+    const periodButtons = document.querySelectorAll('.period-btn');
+    const chartSubLabel = document.getElementById('chart-sub-label');
+    const chartLine = document.getElementById('chart-line');
+    const chartArea = document.getElementById('chart-area');
+
+    const chartDatasets = {
+      semanal: {
+        label: 'Volume total acumulado (6 últimas semanas)',
+        linePath: 'M 20,95 L 75,76 L 130,68 L 180,118 L 240,54 L 305,32',
+        areaPath: 'M 20,95 L 75,76 L 130,68 L 180,118 L 240,54 L 305,32 L 305,150 L 20,150 Z'
+      },
+      mensal: {
+        label: 'Média de volume por microciclo mensal (kg)',
+        linePath: 'M 20,110 L 75,90 L 130,75 L 180,85 L 240,45 L 305,25',
+        areaPath: 'M 20,110 L 75,90 L 130,75 L 180,85 L 240,45 L 305,25 L 305,150 L 20,150 Z'
+      },
+      anual: {
+        label: 'Progressão macroanual de sobrecarga linear (kg)',
+        linePath: 'M 20,130 L 75,115 L 130,95 L 180,75 L 240,50 L 305,20',
+        areaPath: 'M 20,130 L 75,115 L 130,95 L 180,75 L 240,50 L 305,20 L 305,150 L 20,150 Z'
+      }
+    };
+
+    periodButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const period = this.getAttribute('data-period');
+        periodButtons.forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary', 'font-bold');
+          b.classList.add('text-on-surface-variant');
+        });
+        this.classList.add('bg-primary', 'text-on-primary', 'font-bold');
+        this.classList.remove('text-on-surface-variant');
+
+        if (chartDatasets[period]) {
+          if (chartSubLabel) chartSubLabel.textContent = chartDatasets[period].label;
+          if (chartLine) chartLine.setAttribute('d', chartDatasets[period].linePath);
+          if (chartArea) chartArea.setAttribute('d', chartDatasets[period].areaPath);
+        }
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.5)] border-t border-white/[0.04]" data-active-classes="text-primary [filter:drop-shadow(0_0_8px_rgba(56,189,248,0.6))] font-bold"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="treinos-fichas" href="#"><span class="material-symbols-outlined text-[24px]">fitness_center</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Treinos</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all relative" data-path="treino-ativo" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[24px]">timer</span><span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-ping"></span></div><span class="font-label-caps text-label-caps uppercase tracking-wider">Ativo</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="ia-coach-gemini-assistant" href="#"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-caps text-label-caps uppercase tracking-wider">IA Coach</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="nutricao-macros" href="#"><span class="material-symbols-outlined text-[24px]">nutrition</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Nutrição</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="dashboard-tonelagem" href="#"><span class="material-symbols-outlined text-[24px]">military_tech</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Progresso</span></a></div></nav></body></html>

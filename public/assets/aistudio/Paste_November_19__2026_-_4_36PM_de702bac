@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#131b2e", "on-error-container": "#ffdad6", "on-tertiary-fixed": "#001c39", "on-surface-variant": "#bdc8d1", "outline-variant": "#3e484f", "error-container": "#93000a", "secondary-fixed": "#dbe1ff", "surface-container-highest": "#2d3449", "primary-fixed": "#c4e7ff", "on-background": "#dae2fd", "on-primary-container": "#004965", "surface-tint": "#7bd0ff", "surface-dim": "#0b1326", "inverse-surface": "#dae2fd", "surface": "#0b1326", "on-primary-fixed-variant": "#004c69", "primary": "#8ed5ff", "secondary-container": "#0053db", "secondary-fixed-dim": "#b4c5ff", "tertiary-container": "#7bb4ff", "on-primary": "#00354a", "on-secondary": "#002a78", "on-error": "#690005", "surface-variant": "#2d3449", "surface-bright": "#31394d", "on-secondary-container": "#cdd7ff", "on-tertiary-container": "#00457e", "tertiary-fixed-dim": "#a4c9ff", "on-surface": "#dae2fd", "error": "#ffb4ab", "inverse-on-surface": "#283044", "on-secondary-fixed-variant": "#003ea8", "on-tertiary-fixed-variant": "#004883", "surface-container-high": "#222a3d", "primary-container": "#38bdf8", "on-secondary-fixed": "#00174b", "background": "#0b1326", "surface-container-lowest": "#060e20", "secondary": "#b4c5ff", "primary-fixed-dim": "#7bd0ff", "tertiary": "#afcfff", "tertiary-fixed": "#d4e3ff", "inverse-primary": "#00668a", "outline": "#87929a", "surface-container": "#171f33", "on-tertiary": "#00315d", "on-primary-fixed": "#001e2c" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2.25rem", "gutter-desktop": "1.5rem", "margin-desktop": "2.5rem", "space-lg": "1.5rem", "margin": "1rem", "gutter": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-interactive": ["Plus Jakarta Sans"], "label-caps": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "metric-huge": ["Plus Jakarta Sans"], "metric-lg": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "body-md": ["Inter"], "metric-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "label-interactive": ["14px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600"}], "label-caps": ["11px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700"}], "display-hero": ["56px", {"lineHeight": "60px", "letterSpacing": "-0.03em", "fontWeight": "800"}], "display-hero-mobile": ["40px", {"lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "800"}], "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400"}], "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "metric-huge": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "800"}], "metric-lg": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}], "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}], "metric-md": ["20px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}], "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700"}], "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><img alt="Apex Performance Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrDiljOa52qcWyUank09X9IBfROuBWTTUvRDa3nW1bTpE3_y8dXLDbqZClSpk3gkjyw04o4x5Wc77ykoksUujGnikAPa01OWOfbrRFLr5WMXXnohY9mGRLCY0RAmAeLMoFyJK4MUprDig8oIowyLIxgglpPLobvqX2vZEM-k3PYtjYiQZRPQAUcPnPL-uPmYe2YFQd82hFk4pqU8onKKmwLLi1dzbncgliHvk2O4Sq8"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-tight">APEX</span><span class="font-label-caps text-label-caps uppercase text-primary bg-primary/10 px-space-xs py-0.5 rounded-full">LVL 42</span></div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Ia Coach</span></div></div><div class="flex items-center gap-space-sm"><div class="hidden items-center gap-1 bg-surface-container-high px-space-xs py-0.5 rounded-full text-error" id="offline-indicator"><span class="material-symbols-outlined text-[14px]">cloud_off</span><span class="font-label-caps text-label-caps">OFFLINE</span></div><button aria-label="Instalar App" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors" id="pwa-install-btn"><span class="material-symbols-outlined text-[20px]">install_mobile</span></button><div class="relative flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIvAGvCeb0z055152F4yt5Iv2qW0xa8FYwAIixFfwUfunD9HlgoOVFIgW80x2fhEd20Lb84QzJrEaxZPPLtnkK2p3v3BZGI4c8KYrTv62iDOCrRwh4xoC8fYCQ9d_iqs6dr4H6DKR3xLvaCoMDmP0N5_rb6oGP2jfJAVxjWPN8_DZuaOPVzYliYuXzf8kBF8HNOkjqb-O-Ml18RwacnlJiFGFJ5jb1NlB6PNvdtSQ"/><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full ring-2 ring-surface"></span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin space-y-space-md pb-12">
+<!-- AI Status Telemetry Banner -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container p-space-md shadow-md">
+<div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+<div class="flex items-start justify-between gap-space-sm relative z-10">
+<div class="flex items-center gap-space-sm">
+<div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[22px]">psychology</span>
+<span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">Apex AI Coach</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Sobrecarga Progressiva Preditiva</span>
+</div>
+</div>
+<span class="font-label-caps text-label-caps bg-surface-container-highest text-primary px-space-xs py-1 rounded-full uppercase shrink-0">v4.8 Neural</span>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center gap-space-xs">
+<span class="inline-block w-2 h-2 rounded-full bg-primary shrink-0 shadow-[0_0_8px_#38bdf8]"></span>
+<p class="font-body-sm text-body-sm text-primary tracking-wide">
+        Dados biométricos e telemetria das últimas 3 semanas analisados
+      </p>
+</div>
+</div>
+<!-- Stagnation & Deload Interactive Action Module -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md flex flex-col space-y-space-sm relative">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">troubleshoot</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Detector de Platô &amp; Deload</h2>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Tempo Real</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+      Varredura heurística de estagnação por curvas de velocidade (VBT), repetições de reserva (RIR) e tonelagem semanal.
+    </p>
+<!-- Scan Trigger Button -->
+<button class="w-full py-3 px-space-md rounded-xl bg-gradient-to-r from-primary-container to-secondary-container text-on-primary font-label-interactive text-label-interactive flex items-center justify-center gap-space-xs shadow-lg active:scale-[0.98] transition-all" id="scan-stagnation-btn">
+<span class="material-symbols-outlined text-[20px] transition-transform" id="scan-icon">motion_sensor_active</span>
+<span id="scan-btn-text">Verificar Platôs e Estagnação</span>
+</button>
+<!-- Live Scanner Progress Bar (Hidden by default) -->
+<div class="hidden flex-col space-y-1 py-1" id="scan-progress-box">
+<div class="flex justify-between items-center font-label-caps text-label-caps text-primary">
+<span id="scan-status-label">Analisando vetores articulares...</span>
+<span id="scan-perc">0%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full transition-all duration-200" id="scan-bar" style="width: 0%"></div>
+</div>
+</div>
+<!-- Stagnation Alert Container (Visible State) -->
+<div class="rounded-lg bg-surface-container-high p-space-sm space-y-space-xs" id="stagnation-alert-card">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-error">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+<span class="font-label-caps text-label-caps tracking-wider uppercase font-bold">Alerta de Platô Biomecânico</span>
+</div>
+<span class="font-label-caps text-label-caps bg-error-container text-on-error-container px-space-xs py-0.5 rounded-full">Crítico</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-snug">
+<strong class="text-on-surface font-semibold">Desenvolvimento Militar:</strong> Carga paralisada em <span class="text-primary font-semibold">28 kg</span> nos últimos 3 treinos consecutivos com decaimento de cadência na 3ª série.
+      </p>
+<div class="rounded bg-surface-container p-space-xs space-y-1">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[16px]">lightbulb</span>
+<span class="font-label-caps text-label-caps uppercase">Protocolo Corretivo Recomendado</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Executar <strong class="text-on-surface">Deload de 15% (24 kg)</strong> por 1 microciclo com foco em pausa isométrica, ou substituir pelo <strong class="text-on-surface">Desenvolvimento Arnold</strong> para recrutamento do feixe anterior sob novo vetor.
+        </p>
+</div>
+</div>
+</div>
+<!-- Smart Progressive Overload Suggestions Feed -->
+<div class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">trending_up</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Sobrecarga Inteligente</h2>
+</div>
+<span class="font-label-caps text-label-caps text-primary bg-surface-container-high px-space-xs py-1 rounded-full uppercase">Próximo Treino</span>
+</div>
+<!-- Feed Card 1: Supino Reto -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md space-y-space-xs relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">fitness_center</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Supino Reto Barra</h3>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Peitoral • Força Hipertrófica</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-primary">+2.5 kg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Sobrecarga</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-1">
+<div class="p-space-xs rounded-lg bg-surface-container-high">
+<span class="font-label-caps text-label-caps text-on-surface-variant block">Baseline Semanal</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">3x8 @ 82 kg</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block">RPE 7.5 (Ótimo)</span>
+</div>
+<div class="p-space-xs rounded-lg bg-surface-container-high">
+<span class="font-label-caps text-label-caps text-primary block">Alvo Calculado</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">84.5 kg</span>
+<span class="font-body-sm text-body-sm text-primary block">Faixa: 6-8 Repetições</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant pt-1">
+        A aceleração concêntrica manteve-se constante (+0.08 m/s). O limiar neural indica prontidão absoluta para o salto de 2.5 kg.
+      </p>
+</div>
+<!-- Feed Card 2: Levantamento Terra -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md space-y-space-xs">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">speed</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Levantamento Terra</h3>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Cadeia Posterior • Volume Ótimo</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-primary">+1 Rep</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Intensidade</span>
+</div>
+</div>
+<div class="rounded-lg bg-surface-container-high p-space-xs flex items-center justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface-variant block">Tonelagem Acumulada</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">+450 kg acumulados</span>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-on-surface-variant block">Carga Preservada</span>
+<span class="font-body-md text-body-md text-primary font-semibold">140 kg fixos</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Preserve a carga de 140 kg para mitigação de fadiga lombar axial. Progrida adicionando exatamente 1 repetição na 3ª série antes de elevar o peso.
+      </p>
+</div>
+<!-- Feed Card 3: Agachamento Livre -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md space-y-space-xs">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">hourglass_empty</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Agachamento Livre</h3>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Quadríceps • Otimização Metabólica</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-metric-md text-metric-md text-primary">-30s</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Densidade</span>
+</div>
+</div>
+<div class="p-space-xs rounded-lg bg-surface-container-high flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Descanso entre séries:</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold"><span class="line-through text-on-surface-variant">180 seg</span> → <span class="text-primary">150 seg</span></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        RPE registrado foi 6.0 no microciclo anterior com frequência cardíaca estável. Comprimir o descanso elevará o estresse metabólico sem estresse articular extra.
+      </p>
+</div>
+</div>
+<!-- Visual Biometrics Break with Lifestyle Image Placeholders -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="rounded-xl overflow-hidden bg-surface-container relative h-36">
+<img class="w-full h-full object-cover" data-alt="Athletic male bodybuilder performing heavy overhead military press in a dimly lit underground futuristic gym with cyan LED neon rim lighting dark precision athletic aesthetics" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVFLGl1xPWEX2DWHCObEqjhJHzRLGu7hbQXU8o2VRNx7ODIbcx7zgPPUARjrS7bUCR-Ck6ARa9TDFBH8KMyOqk1BmZS8rIR3iMSmdHwoI_Mpl3Exm9kd7e7oQGAJP0iOrz7Pf4wyzgBP4ORfB7DFqgXzPbSdM5T_vEch8GBHcqQmxMvL3ZSiXtYavbHjtizNfQRpxQr-qBPdOBaLVsXgXV8pw7diHXf0U0WAcrqqo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent flex flex-col justify-end p-space-xs">
+<span class="font-label-caps text-label-caps text-primary uppercase">Mecânica de Empurrar</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Vetor Deltoide Anterior</span>
+</div>
+</div>
+<div class="rounded-xl overflow-hidden bg-surface-container relative h-36">
+<img class="w-full h-full object-cover" data-alt="Close up macro shot of precision barbell knurling and olympic plates locked in a power rack glowing with cyan neon telemetry backlights futuristic biomechanics setup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrVD64s7JK9U9aumIWj2x0oMhVhI9FElP1T5a4Kke5q9y3C6STNV1z7Wl72KuGNNufvWs1bi6xxq9W_jt_d7fBNVhhFytqvvN75vZzBN2RaX3lgzSk5aUbB7sKkcgoRxxsu2GwBjV6BPwWmtcpxAATFP-ZoRNQW5J5n09JtI-zCqU5Dei5KOujwGfhrQyFd0Jx_lOcLNLr8tiHTM5SIMgALVd5Id5WsoQEaCJUTzo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent flex flex-col justify-end p-space-xs">
+<span class="font-label-caps text-label-caps text-primary uppercase">Carga • Tensão Mecânica</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Sobrecarga Linear Ótima</span>
+</div>
+</div>
+</div>
+<!-- Interactive AI Chat Consultation Widget -->
+<div class="rounded-xl bg-surface-container p-space-md shadow-md space-y-space-md relative">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">forum</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Consultoria IA em Tempo Real</h2>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-caps text-label-caps text-primary uppercase">Online</span>
+</div>
+</div>
+<!-- Quick Prompts Pills -->
+<div class="flex flex-col space-y-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Consultas Frequentes</span>
+<div class="flex gap-space-xs overflow-x-auto pb-1 no-scrollbar">
+<button class="ai-prompt-btn whitespace-nowrap px-space-sm py-1.5 rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest font-label-caps text-label-caps uppercase transition-colors shrink-0" data-query="Como quebrar o platô no supino reto?">
+          Como quebrar platô no supino?
+        </button>
+<button class="ai-prompt-btn whitespace-nowrap px-space-sm py-1.5 rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest font-label-caps text-label-caps uppercase transition-colors shrink-0" data-query="Devo fazer deload completo esta semana?">
+          Devo fazer deload essa semana?
+        </button>
+<button class="ai-prompt-btn whitespace-nowrap px-space-sm py-1.5 rounded-full bg-surface-container-high text-primary hover:bg-surface-container-highest font-label-caps text-label-caps uppercase transition-colors shrink-0" data-query="Como ajustar o volume semanal de ombros sem fadiga?">
+          Ajustar volume de ombros
+        </button>
+</div>
+</div>
+<!-- Dynamic Chat Thread Area -->
+<div class="flex flex-col space-y-space-sm max-h-[360px] overflow-y-auto pr-1" id="chat-thread">
+<!-- Initial AI Welcome Message Bubble -->
+<div class="flex items-start gap-space-xs">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<div class="rounded-xl rounded-tl-none bg-surface-container-high p-space-sm max-w-[85%] shadow-sm">
+<span class="font-label-caps text-label-caps text-primary block mb-0.5">Apex Neural Engine</span>
+<p class="font-body-sm text-body-sm text-on-surface">
+            Pronto para ajustar seu volume e intensidade. Seus dados de fadiga central indicam 88% de prontidão do SNC. Como posso refinar sua periodização hoje?
+          </p>
+</div>
+</div>
+</div>
+<!-- Interactive Input Bar -->
+<form class="relative flex items-center gap-space-xs pt-1" id="ai-chat-form">
+<input autocomplete="off" class="w-full h-12 bg-surface-container-high text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm rounded-xl px-space-sm focus:outline-none focus:bg-surface-container-highest transition-colors" id="ai-user-input" placeholder="Pergunte sobre séries, RPE, deload ou periodização..." type="text"/>
+<button aria-label="Enviar Pergunta" class="h-12 w-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 hover:bg-primary transition-all active:scale-95 shadow-md" type="submit">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</form>
+</div>
+</div>
+<script>
+  (function initAICoachModule() {
+    const scanBtn = document.getElementById('scan-stagnation-btn');
+    const scanIcon = document.getElementById('scan-icon');
+    const scanBtnText = document.getElementById('scan-btn-text');
+    const scanProgressBox = document.getElementById('scan-progress-box');
+    const scanBar = document.getElementById('scan-bar');
+    const scanPerc = document.getElementById('scan-perc');
+    const scanStatusLabel = document.getElementById('scan-status-label');
+    const stagnationCard = document.getElementById('stagnation-alert-card');
+
+    const chatForm = document.getElementById('ai-chat-form');
+    const chatInput = document.getElementById('ai-user-input');
+    const chatThread = document.getElementById('chat-thread');
+    const promptBtns = document.querySelectorAll('.ai-prompt-btn');
+
+    // Algorithmic scan simulation
+    if (scanBtn) {
+      scanBtn.addEventListener('click', () => {
+        scanBtn.disabled = true;
+        scanBtn.classList.add('opacity-75');
+        scanProgressBox.classList.remove('hidden');
+        scanProgressBox.classList.add('flex');
+        scanIcon.classList.add('animate-spin');
+        scanBtnText.textContent = 'Processando Modelagem Biomecânica...';
+        
+        let progress = 0;
+        const stages = [
+          'Calculando velocidade concêntrica média (VBT)...',
+          'Avaliando desaceleração de Reps em Reserva (RIR)...',
+          'Cruzando tonelagem com histórico de 21 dias...',
+          'Detectando assimetrias na curvatura de força...'
+        ];
+
+        const interval = setInterval(() => {
+          progress += 5;
+          if (progress > 100) progress = 100;
+
+          scanBar.style.width = progress + '%';
+          scanPerc.textContent = progress + '%';
+
+          const stageIndex = Math.floor((progress / 100) * stages.length);
+          if (stages[stageIndex]) {
+            scanStatusLabel.textContent = stages[stageIndex];
+          }
+
+          if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              scanIcon.classList.remove('animate-spin');
+              scanBtnText.textContent = 'Varredura Concluída &bull; Platô Mapeado';
+              scanBtn.disabled = false;
+              scanBtn.classList.remove('opacity-75');
+              scanProgressBox.classList.add('hidden');
+              scanProgressBox.classList.remove('flex');
+              
+              // Pulsing highlight effect on the diagnosis card
+              stagnationCard.classList.add('animate-pulse');
+              setTimeout(() => stagnationCard.classList.remove('animate-pulse'), 1200);
+            }, 400);
+          }
+        }, 60);
+      });
+    }
+
+    // Knowledge base for conversational simulation
+    const coachResponses = {
+      supino: 'Para superar o platô de supino: seus dados apontam falha no ponto de transição concêntrica (sticking point a 5cm do peito). Recomendo prescrever 3 semanas de Supino com Pausa de 2 segundos (Spoto Press) a 70% de 1RM e incremento de 15% no volume semanal de tríceps (foco em extensão na polia com corda).',
+      deload: 'Análise de Prontidão: Sua tonelagem total semanal atingiu 14.800 kg com RPE médio de 8.8 nos últimos 12 treinos. Você não necessita de um deload passivo total, mas sim um Deload Reativo: reduza as séries totais de 4 para 2 em movimentos compostos por 5 dias, mantendo a intensidade de carga intacta.',
+      ombros: 'Para os ombros: o feixe lateral tolera alta frequência devido à proporção de fibras tipo I. Você pode adicionar Elevação Lateral com cabos 3x por semana (3x15 reps) mantendo RPE 8. Isso eleva a resposta de síntese proteica miofibrilar sem sobrecarregar o manguito rotador.',
+      padrao: 'Com base nas leis de Hanneman e recrutamento de unidades motoras: para essa adaptação, priorize a cadência concêntrica máxima pretendida (CAT) mantendo RIR entre 1 e 2 repetições. Isso maximizará a tensão mecânica sem exaustão do sistema dopaminérgico.'
+    };
+
+    function appendUserMessage(text) {
+      const bubble = document.createElement('div');
+      bubble.className = 'flex items-start justify-end gap-space-xs';
+      bubble.innerHTML = `
+        <div class="rounded-xl rounded-tr-none bg-primary p-space-sm max-w-[85%] shadow-sm">
+          <span class="font-label-caps text-label-caps text-on-primary-container block mb-0.5 text-right font-bold">Você</span>
+          <p class="font-body-sm text-body-sm text-on-primary font-medium">${text}</p>
+        </div>
+      `;
+      chatThread.appendChild(bubble);
+      chatThread.scrollTop = chatThread.scrollHeight;
+    }
+
+    function appendAITypingAndReply(responseText) {
+      const typingBubble = document.createElement('div');
+      typingBubble.className = 'flex items-start gap-space-xs';
+      typingBubble.id = 'ai-typing-indicator';
+      typingBubble.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+        </div>
+        <div class="rounded-xl rounded-tl-none bg-surface-container-high p-space-sm max-w-[85%] flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">Sintetizando fisiologia do exercício...</span>
+        </div>
+      `;
+      chatThread.appendChild(typingBubble);
+      chatThread.scrollTop = chatThread.scrollHeight;
+
+      setTimeout(() => {
+        const indicator = document.getElementById('ai-typing-indicator');
+        if (indicator) indicator.remove();
+
+        const replyBubble = document.createElement('div');
+        replyBubble.className = 'flex items-start gap-space-xs';
+        replyBubble.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+          </div>
+          <div class="rounded-xl rounded-tl-none bg-surface-container-high p-space-sm max-w-[85%] shadow-sm">
+            <span class="font-label-caps text-label-caps text-primary block mb-0.5">Apex Neural Engine</span>
+            <p class="font-body-sm text-body-sm text-on-surface leading-relaxed">${responseText}</p>
+          </div>
+        `;
+        chatThread.appendChild(replyBubble);
+        chatThread.scrollTop = chatThread.scrollHeight;
+      }, 750);
+    }
+
+    function handleUserSubmission(query) {
+      if (!query.trim()) return;
+      appendUserMessage(query);
+
+      const q = query.toLowerCase();
+      let answer = coachResponses.padrao;
+      if (q.includes('supino') || q.includes('platô')) {
+        answer = coachResponses.supino;
+      } else if (q.includes('deload') || q.includes('semana') || q.includes('descanso')) {
+        answer = coachResponses.deload;
+      } else if (q.includes('ombro') || q.includes('volume') || q.includes('delt')) {
+        answer = coachResponses.ombros;
+      }
+
+      appendAITypingAndReply(answer);
+    }
+
+    if (chatForm) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = chatInput.value;
+        if (text) {
+          handleUserSubmission(text);
+          chatInput.value = '';
+        }
+      });
+    }
+
+    promptBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const query = btn.getAttribute('data-query');
+        if (query) {
+          handleUserSubmission(query);
+        }
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.4)]" data-active-classes="text-primary [filter:drop-shadow(0_0_8px_rgba(56,189,248,0.6))]"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="treinos" href="#"><span class="material-symbols-outlined text-[24px]">fitness_center</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Treinos</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all relative" data-path="treino-ativo" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[24px]">timer</span><span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-ping"></span></div><span class="font-label-caps text-label-caps uppercase tracking-wider">Ativo</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] transition-all text-primary [filter:drop-shadow(0_0_8px_rgba(56,189,248,0.6))]" data-path="ia-coach" href="#"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-caps text-label-caps uppercase tracking-wider">IA Coach</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="nutricao" href="#"><span class="material-symbols-outlined text-[24px]">nutrition</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Nutrição</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all" data-path="progresso" href="#"><span class="material-symbols-outlined text-[24px]">military_tech</span><span class="font-label-caps text-label-caps uppercase tracking-wider">Progresso</span></a></div></nav></body></html>

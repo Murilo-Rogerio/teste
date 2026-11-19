@@ -1,0 +1,6 @@
+{
+  "name": "Apex Performance",
+  "description": "App de alta performance para treinos de musculação, rastreamento de séries e cargas, IA Coach com Gemini, nutrição e telemetria de progresso offline-first.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
